@@ -2,25 +2,22 @@ import { notification } from "../../../../seiv-proj3-backend/app/models/index.js
 import apiClient from "./services.js";
 
 export default {
-  getNotification() {
-    return apiClient.get(`/faculty`);
+  getAllNotifications() {
+    return apiClient.get(`/notifications`);
   },
-  getFaculty(facultyId) {
-    return apiClient.get(`/faculty/${facultyId}`);
+  getNotification(notificationId) {
+    return apiClient.get(`/notifications/${notificationId}`);
   },
-  getAllCoursesForFaculty (facultyId) {
-    return apiClient.get(`/faculty/${facultyId}/courses`);
+  createNotification(data) {
+    return apiClient.post(`/notifications`, data);
   },
-  createFaculty(data) {
-    return apiClient.post(`/faculty`, data);
+  updateNotification(notificationId, data) {
+    return apiClient.put(`/notifications/${notificationId}`, data);
   },
-  updateFaculty(facultyId, data) {
-    return apiClient.put(`/faculty/${facultyId}`, data);
+  deleteNotification(notificationId) {
+    return apiClient.delete(`/notifications/${notificationId}`);
   },
-  deleteFaculty(facultyId) {
-    return apiClient.delete(`/faculty/${facultyId}`);
-  },
-  deleteAllFaculty() {
-    return apiClient.delete(`/faculty`);
+  deleteAllNotifications() {
+    return apiClient.delete(`/notifications`);
   },
 };
