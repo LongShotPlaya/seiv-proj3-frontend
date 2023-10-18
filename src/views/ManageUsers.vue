@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 <script setup>
 import UserServices from "../services/userServices";
 import Utils from "../config/utils.js";
@@ -94,4 +92,3 @@ retrieveUsers();
 <style>
 
 </style>
->>>>>>> Stashed changes

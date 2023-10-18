@@ -136,6 +136,7 @@ router.beforeEach((to, from) => {
       return { name: 'login' }
     }
   }
+  return true;
 })
 
 export default router;

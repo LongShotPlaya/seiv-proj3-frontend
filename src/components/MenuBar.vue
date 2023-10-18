@@ -40,6 +40,7 @@ onMounted(() => {
 <template>
   <div>
     <v-app-bar app>
+      <!-- 
       <router-link :to="{ name: 'tutorials' }">
         <v-img
           class="mx-2"
@@ -48,15 +49,15 @@ onMounted(() => {
           width="50"
           contain
         ></v-img>
-      </router-link>
+      </router-link>-->
       <v-toolbar-title class="title">
         {{ title }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <div v-if="user">
+      <!-- <div v-if="user">
         <v-btn class="mx-2" :to="{ name: 'tutorials' }"> List </v-btn>
         <v-btn class="mx-2" :to="{ name: 'add' }"> Add Tutorial </v-btn>
-      </div>
+      </div> -->
       <v-menu bottom min-width="200px" rounded offset-y v-if="user">
         <template v-slot:activator="{ props }">
           <v-btn v-bind="props" icon x-large>
