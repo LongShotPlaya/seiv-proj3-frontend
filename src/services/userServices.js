@@ -13,6 +13,9 @@ export default {
   updateUser(userId, data) {
     return apiClient.put(`/user/${userId}`, data);
   },
+  updateUserRoles(data) {
+    return apiClient.put(`/user`, data);
+  },
   deleteUser(userId) {
     return apiClient.delete(`/user/${userId}`);
   },
