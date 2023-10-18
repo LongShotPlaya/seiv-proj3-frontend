@@ -1,4 +1,3 @@
-import { request } from "../../../../seiv-proj3-backend/app/models/index.js";
 import apiClient from "./services.js";
 
 export default {
