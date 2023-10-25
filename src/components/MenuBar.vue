@@ -5,8 +5,7 @@ import Utils from "../config/utils";
 import AuthServices from "../services/authServices";
 import { useRouter } from "vue-router";
 
-const router = useRouter ();
-
+const router = useRouter();
 const user = ref(null);
 const title = ref("Tutorials");
 const initials = ref("");
