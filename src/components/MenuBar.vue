@@ -6,7 +6,6 @@ import AuthServices from "../services/authServices";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-
 const user = ref(null);
 const title = ref("Accommodations");
 const initials = ref("");
@@ -27,7 +26,7 @@ const logout = () => {
     .then((response) => {
       console.log(response);
       Utils.removeItem("user");
-      $router.push({ name: "login" });
+      router.push({ name: "login" });
     })
     .catch((error) => {
       console.log("error", error);
