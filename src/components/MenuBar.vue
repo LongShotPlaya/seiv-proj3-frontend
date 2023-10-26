@@ -3,9 +3,12 @@ import ocLogo from "/oc-logo-white.png";
 import { ref, onMounted } from "vue";
 import Utils from "../config/utils";
 import AuthServices from "../services/authServices";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const user = ref(null);
-const title = ref("Tutorials");
+const title = ref("Accommodations");
 const initials = ref("");
 const name = ref("");
 const logoURL = ref("");
@@ -35,6 +38,23 @@ onMounted(() => {
   logoURL.value = ocLogo;
   resetMenu();
 });
+
+const authorize = (authLevel) => {
+    console.log(user.value);
+    return true 
+};
+
+//NavBar Menu  
+const items = [
+    { title: 'Home', routeName: "home", authLevel: "any" },    
+    { title: 'OC Schedule', routeName: "ocSchedule", authLevel: "admin" },        
+    { title: 'User', routeName: "manageUsers", authLevel: "admin" },
+];
+
+
+const menu = () => {
+    console.log("Menu");
+};
 </script>
 
 <template>
@@ -50,6 +70,22 @@ onMounted(() => {
           contain
         ></v-img>
       </router-link>-->
+ 
+      <v-menu>
+            <template v-slot:activator="{ props }">
+              <v-btn icon="mdi-menu" v-bind="props"></v-btn>
+            </template>
+            <v-list>
+              <v-list-item
+                v-for="(item, i) in items"
+                :key="i"
+                :v-if="authorize(item.authLevel)" 
+              >
+              <v-list-item-title @click="router.push({name: item.routeName})">{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+
       <v-toolbar-title class="title">
         {{ title }}
       </v-toolbar-title>
