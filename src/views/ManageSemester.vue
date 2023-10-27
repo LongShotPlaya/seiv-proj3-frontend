@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import SemesterServices from "../services/semesterServices.js";
 import { useRouter } from "vue-router";
+import { VDatePicker } from 'vuetify/labs/VDatePicker'
 
 const router = useRouter();
 
@@ -19,6 +20,8 @@ const semester = ref({
 	startDate: "",
 	endDate: "",
 });
+const sDate = ref(semester.startDate);
+const eDate = ref(semester.endDate);
 
 const add = () => {
   const data = {
@@ -130,6 +133,14 @@ onMounted(() => {
 
 					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.endDate" id="endDate" label="End Date">
 					</v-text-field>
+					
+					<v-row justify="center">
+					<v-date-picker :model-value="sDate" :landscape="true" id="startDate" label="Start Date" required>
+					</v-date-picker>
+					<v-date-picker :model-value="eDate" :landscape="true" id="endDate" label="End Date" required>
+					</v-date-picker>
+					</v-row>
+					<br />
 					<v-card-actions>
 						<v-btn :disabled=addDisabled color="success" class="mr-4" @click="add">
 						Add
