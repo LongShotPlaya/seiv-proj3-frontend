@@ -1,7 +1,7 @@
 import apiClient from "./services.js";
 
 export default {
-  getAllAccomodationsCat() {
+  getAllAccomodationCats() {
     return apiClient.get(`/accomodationCats`);
   },
   getAccomodationCat(accomodationCatId) {
