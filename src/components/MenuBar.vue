@@ -67,8 +67,8 @@ onMounted(() => {
 
 const authorize = (authLevel) => {
     //Role can be Student, Faculty, or Administrator  
-    if(!user.value) return false;
     if(authLevel == "any") return true; 
+    if(!user.value) return false;
     if(authLevel == "admin" && user.value.role == "Administrator") return true;
     if(authLevel == "student" && user.value.role == "Student") return true;
     if(authLevel == "faculty" && user.value.role == "Faculty") return true;    
