@@ -7,6 +7,8 @@ import { VDatePicker } from 'vuetify/labs/VDatePicker'
 const router = useRouter();
 
 const message = ref("");
+const test1 = ref("blegh");
+const test2 = ref("ashliegh");
 const props = defineProps({
   id: {
     required: true,
@@ -20,16 +22,15 @@ const semester = ref({
 	startDate: "",
 	endDate: "",
 });
-const sDate = ref(semester.startDate);
-const eDate = ref(semester.endDate);
+const dates = ref(semester.startDate, semester.endDate);
 
 const add = () => {
   const data = {
     name: semester.value.name,
-    startDate: semester.value.startDate,
-	endDate: semester.value.endDate,
+    startDate: dates[0],
+	endDate: dates[1],
   };
-  if (semester.value.name != "" && semester.value.name != null && semester.value.startDate != null && semester.value.endDate != null)
+  if (semester.value.name != "" && semester.value.name != null)
   {
   SemesterServices.createSemester(data)
     .then((response) => {
@@ -64,10 +65,10 @@ const retrieve = async () => {
 const update = async () => {
   const data = {
     name: semester.value.name,
-    startDate: semester.value.startDate,
-	endDate: semester.value.endDate,
+    startDate: dates[0],
+	endDate: dates[1],
   };
-  if (semester.value.name != "" && semester.value.name != null && semester.value.startDate != null && semester.value.endDate != null)
+  if (semester.value.name != "" && semester.value.name != null)
   {
 	try {
 		const response = await SemesterServices.updateSemester(props.id, data);
@@ -113,6 +114,9 @@ onMounted(() => {
 		deleteDisabled = false;
 	}
 });
+
+test1.value = dates[0];
+test2.value = dates[1];
 </script>
 
 <template>
@@ -128,16 +132,13 @@ onMounted(() => {
 					<v-text-field required v-model="semester.name" id="name" label="Name">
 					</v-text-field>
 
-					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.startDate" id="startDate" label="Start Date">
+					<!-- <v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.startDate" id="startDate" label="Start Date">
 					</v-text-field>
-
 					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.endDate" id="endDate" label="End Date">
-					</v-text-field>
+					</v-text-field> -->
 					
 					<v-row justify="center">
-					<v-date-picker :model-value="sDate" :landscape="true" id="startDate" label="Start Date" required>
-					</v-date-picker>
-					<v-date-picker :model-value="eDate" :landscape="true" id="endDate" label="End Date" required>
+					<v-date-picker :multiple="true" :model-value="dates" :landscape="true" id="dates" label="Dates" required>
 					</v-date-picker>
 					</v-row>
 					<br />
@@ -160,6 +161,10 @@ onMounted(() => {
 			</div>
 			<br />
       		<h4>{{ message }}</h4>
+			<br />
+			<h4>{{ test1 }}</h4>
+			<br />
+			<h4>{{ test2 }}</h4>
       		<br />
 	</v-container>
 </template>
