@@ -7,8 +7,6 @@ import { VDatePicker } from 'vuetify/labs/VDatePicker'
 const router = useRouter();
 
 const message = ref("");
-const test1 = ref("blegh");
-const test2 = ref("ashliegh");
 const props = defineProps({
   id: {
     required: true,
@@ -22,13 +20,13 @@ const semester = ref({
 	startDate: "",
 	endDate: "",
 });
-const dates = ref(semester.startDate, semester.endDate);
+const dates = ref([]);
 
 const add = () => {
   const data = {
     name: semester.value.name,
-    startDate: dates[0],
-	endDate: dates[1],
+    startDate: semester.value.startDate,
+	endDate: semester.value.endDate,
   };
   if (semester.value.name != "" && semester.value.name != null)
   {
@@ -65,8 +63,8 @@ const retrieve = async () => {
 const update = async () => {
   const data = {
     name: semester.value.name,
-    startDate: dates[0],
-	endDate: dates[1],
+    startDate: semester.value.startDate,
+	endDate: semester.value.endDate,
   };
   if (semester.value.name != "" && semester.value.name != null)
   {
@@ -92,6 +90,10 @@ const deleteThis = () => {
   router.push({ name: "home" });
 };
 
+const getDate = () => {
+	console.log(dates.value);
+}
+
 var mode = ref("");
 var addDisabled = false;
 var updateDisabled = false;
@@ -115,8 +117,6 @@ onMounted(() => {
 	}
 });
 
-test1.value = dates[0];
-test2.value = dates[1];
 </script>
 
 <template>
@@ -132,15 +132,17 @@ test2.value = dates[1];
 					<v-text-field required v-model="semester.name" id="name" label="Name">
 					</v-text-field>
 
-					<!-- <v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.startDate" id="startDate" label="Start Date">
+					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.startDate" id="startDate" label="Start Date">
 					</v-text-field>
 					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.endDate" id="endDate" label="End Date">
-					</v-text-field> -->
+					</v-text-field>
 					
-					<v-row justify="center">
-					<v-date-picker :multiple="true" :model-value="dates" :landscape="true" id="dates" label="Dates" required>
-					</v-date-picker>
-					</v-row>
+					<!-- <v-row justify="center">
+						<v-date-picker 
+							:multiple="true" v-model="dates" @update:displayDate="getDate()"
+							id="dates" label="Dates" required>
+						</v-date-picker>
+					</v-row> -->
 					<br />
 					<v-card-actions>
 						<v-btn :disabled=addDisabled color="success" class="mr-4" @click="add">
@@ -161,10 +163,6 @@ test2.value = dates[1];
 			</div>
 			<br />
       		<h4>{{ message }}</h4>
-			<br />
-			<h4>{{ test1 }}</h4>
-			<br />
-			<h4>{{ test2 }}</h4>
       		<br />
 	</v-container>
 </template>
