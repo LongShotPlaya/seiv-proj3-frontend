@@ -20,7 +20,6 @@ const semester = ref({
 	startDate: "",
 	endDate: "",
 });
-const dates = ref([]);
 
 const add = () => {
   const data = {
@@ -28,7 +27,7 @@ const add = () => {
     startDate: semester.value.startDate,
 	endDate: semester.value.endDate,
   };
-  if (semester.value.name != "" && semester.value.name != null)
+  if (semester.value.name != "" && semester.value.name != null && semester.value.startDate != null && semester.value.endDate != null)
   {
   SemesterServices.createSemester(data)
     .then((response) => {
@@ -66,7 +65,7 @@ const update = async () => {
     startDate: semester.value.startDate,
 	endDate: semester.value.endDate,
   };
-  if (semester.value.name != "" && semester.value.name != null)
+  if (semester.value.name != "" && semester.value.name != null && semester.value.startDate != null && semester.value.endDate != null)
   {
 	try {
 		const response = await SemesterServices.updateSemester(props.id, data);
@@ -89,10 +88,6 @@ const deleteThis = () => {
   SemesterServices.deleteSemester(props.id)
   router.push({ name: "home" });
 };
-
-const getDate = () => {
-	console.log(dates.value);
-}
 
 var mode = ref("");
 var addDisabled = false;
