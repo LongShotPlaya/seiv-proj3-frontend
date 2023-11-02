@@ -46,7 +46,7 @@ const refreshACats = () => {
 const refreshAccoms = () => {
     AccomServices.getAllAccomodations()
         .then((response) => {
-            let data = response.data;
+            let data = response.data.map(item => { return {...item, accomCat: accomCats.value.find(cat => item.accomodationCatId == cat.id)} });
             if (userRole.value != "Administrator")
                 data = response.data.filter(accom => !!studentAccoms.value.find(sAccom => sAccom.accomodationId == accom.id));
             accoms.value = data;
@@ -166,8 +166,8 @@ onMounted(() => {
     refreshRequest();
     refreshStudent();
     refreshSemester();
-    refreshStudentAccoms();
     refreshACats();
+    refreshStudentAccoms();
     refreshAccoms();
 });
 </script>
@@ -178,6 +178,7 @@ onMounted(() => {
             <v-card-title class="text-h4">Request Details</v-card-title>
             <v-card-title>Student: {{ `${student.fName} ${student.lName}` }}</v-card-title>
             <v-card-title>Semester: {{ `${semester.name}` }}</v-card-title>
+            <v-card-title>Requested On: {{ `${request.requestDate}` }}</v-card-title>
             <v-card-title>Request Status: {{ request.status }}</v-card-title>
             <br>
             <v-card-title>Accommodations:</v-card-title>
@@ -186,12 +187,12 @@ onMounted(() => {
                 v-model="selAccoms"
                 :headers="[
                     { title: 'Name', align: 'start', key: 'name'},
-                    { title: 'Category', align: 'end', key: 'accomodationCatId' }
+                    { title: 'Category', align: 'end', key: 'accomCat' }
                 ]"
                 :items="accoms"
                 :sort-by="[{ key: 'name', order: 'asc' }]"
                 :items-per-page="10"
-                :item-value="item => `${item.name}-${accomCats.find(cat => item.accomodationCatId == cat.id)}`"
+                return-object
                 select-strategy="multiple"
                 :show-select="userRole == 'Administrator'"
             ></v-data-table>
