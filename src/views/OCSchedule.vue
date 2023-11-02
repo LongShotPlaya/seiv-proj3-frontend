@@ -35,6 +35,11 @@ const refreshSemesters = () => {
         .catch((e) => {
             message.value = e.response.data.message;
         });
+    semesterChanged();
+}
+
+const editSemester = () => {
+    router.push({ name: 'manageSemester', params: { id: selSem.value[0].id } });
 }
 
 const refreshCourses = () => {
@@ -72,7 +77,14 @@ const semesterChanged = () => {
 }
 
 const deleteSems = () => {
-    console.log(selSem.value)
+    SemesterServices.deleteSemester(selSem.value[0].id)
+        .then((response) => {
+            selSem.value = [];
+            refreshSemesters();
+        })
+        .catch((err) => {
+            message.value = e.response.data.message;
+        });
 }
 
 const courseChanged = () => {
@@ -80,7 +92,14 @@ const courseChanged = () => {
 }
 
 const deleteCourses = () => {
-    
+    CourseServices.deleteCourse(selCourses.value[0].id)
+        .then((response) => {
+            selCourses.value = [];
+            refreshCourses();
+        })
+        .catch((err) => {
+            message.value = e.response.data.message;
+        })
 }
 
 const facultyChanged = () => {
@@ -117,7 +136,7 @@ onMounted(() => {
                     <v-row>
                         <v-col align-self="center">
                             <v-row justify="center">
-                                <v-card-title class="text-center">{{ !!selSem.values[0] ? `${selSem.values[0].name}` : `No semester selected` }}</v-card-title>
+                                <v-card-title class="text-center">{{ !!selSem[0] ? `Semester: ${selSem[0].name}` : `No semester selected` }}</v-card-title>
                             </v-row>
                             <br><br><br>
                             <v-row justify="center">
@@ -131,7 +150,7 @@ onMounted(() => {
                                     <v-btn
                                         :color="(selSem.length != 1) ? `` : `secondary`"
                                         :disabled="selSem.length != 1"
-                                        @click="router.push({ name: 'manageSemester', params: { id: selSem[0].id } })"
+                                        @click="editSemester"
                                     >Edit</v-btn>
                                 </v-col>
                                 <v-col cols="3">
@@ -155,8 +174,9 @@ onMounted(() => {
                                 :items="semesters"
                                 :sort-by="[{ key: 'name', order: 'asc' }]"
                                 :items-per-page="5"
-                                :item-value="item => `${item.name}-${item.startDate}-${item.endDate}`"
-                                select-strategy="single"
+                                :items-per-page-options="[{value:5, title:'5'}]"
+                                return-object
+                                select-strategy='single'
                                 show-select
                                 @input="semesterChanged"
                             ></v-data-table>
@@ -166,7 +186,7 @@ onMounted(() => {
             </v-col>
         </v-row>
         <v-spacer></v-spacer>
-        <v-row v-if="!selSem[0]">
+        <v-row v-if="!!selSem[0]">
             <v-col>
                 <v-card>
                     <v-card-title class="text-center" style="font-size: 20pt;">Course Scheduling</v-card-title>
@@ -186,7 +206,8 @@ onMounted(() => {
                                                 :items="courses"
                                                 :sort-by="[{ key: 'courseNo', order: 'asc' }]"
                                                 :items-per-page="10"
-                                                :item-value="item => `${item.courseNo}-${item.name}`"
+                                                :items-per-page-options="[{value:10, title:'10'}]"
+                                                return-object
                                                 select-strategy="multiple"
                                                 show-select
                                                 @input="courseChanged"
@@ -210,8 +231,8 @@ onMounted(() => {
                                         </v-col>
                                         <v-col cols="2">
                                             <v-btn
-                                                color="primary" 
-                                                :disabled="selCourses.length <= 0"
+                                                color="primary"
+                                                :disabled="selCourses.length != 1"
                                                 @click="deleteCourses" 
                                             >Delete</v-btn>
                                         </v-col>
@@ -231,7 +252,8 @@ onMounted(() => {
                                                 :items="faculty"
                                                 :sort-by="[{ key: 'lName', order: 'asc' }]"
                                                 :items-per-page="10"
-                                                :item-value="item => `${item.fName}-${item.lName}-${item.email}`"
+                                                :items-per-page-options="[{value:10, title:'10'}]"
+                                                return-object
                                                 select-strategy="multiple"
                                                 :show-select="selSchedules.length == 1"
                                                 @input="facultyChanged"
@@ -253,7 +275,8 @@ onMounted(() => {
                                                 :items="students"
                                                 :sort-by="[{ key: 'lName', order: 'asc' }]"
                                                 :items-per-page="10"
-                                                :item-value="item => `${item.fName}-${item.lName}-${item.email}`"
+                                                :items-per-page-options="[{value:10, title:'10'}]"
+                                                return-object
                                                 select-strategy="multiple"
                                                 :show-select="selSchedules.length == 1"
                                                 @input="studentChanged"
@@ -265,7 +288,7 @@ onMounted(() => {
                         </v-col>
                         <v-col>
                             <v-card>
-                                <v-card-title class="text-center">Courses In {{ selSem[0] }}</v-card-title>
+                                <v-card-title class="text-center">Courses In {{ selSem[0].name }}</v-card-title>
                                 <v-data-table
                                     v-model="selSchedules"
                                     :headers="[
@@ -275,7 +298,8 @@ onMounted(() => {
                                     :items="schedules"
                                     :sort-by="[{ key: 'courseNo', order: 'asc' }]"
                                     :items-per-page="10"
-                                    :item-value="item => `${item.courseNo}-${item.name}`"
+                                    :items-per-page-options="[{value:10, title:'10'}]"
+                                    return-object
                                     select-strategy="single"
                                     :show-select="slide > 0"
                                     @input="scheduleChanged"
