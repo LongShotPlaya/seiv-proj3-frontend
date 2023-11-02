@@ -33,6 +33,28 @@ const refreshAccs = () => {
         });
 };
 
+const deleteAccCat = () => {
+    AccomCatServices.deleteAccomodationCat(selAccCat.value[0].id)
+        .then((response) => {
+            selAccCat.value = [];
+            refreshAccCats();
+        })
+        .catch((err) => {
+            message.value = err.response.data.message;
+        });
+};
+
+const deleteAcc = () => {
+    AccomServices.deleteAccomodation(selAcc.value[0].id)
+        .then((response) => {
+            selAcc.value = [];
+            refreshAccs();
+        })
+        .catch((err) => {
+            message.value = err.response.data.message;
+        });
+}
+
 onMounted(() => {
     refreshAccCats();
     refreshAccs();
@@ -57,6 +79,30 @@ onMounted(() => {
                 select-strategy='single'
                 show-select
             ></v-data-table>
+            <br>
+            <v-row justify="center">
+                <v-col cols="1">
+                    <v-btn
+                        color="secondary"
+                        @click="router.push({ name: 'accommodationCategory', params: { id: 'add' } })"
+                    >Add</v-btn>
+                </v-col>
+                <v-col cols="1">
+                    <v-btn
+                        :color="(selAccCat.length != 1) ? `` : `secondary`"
+                        :disabled="selAccCat.length != 1"
+                        @click="router.push({ name: 'accommodationCategory', params: { id: selAccCat[0].id }})"
+                    >Edit</v-btn>
+                </v-col>
+                <v-col cols="1">
+                    <v-btn
+                        color="primary" 
+                        :disabled="selAccCat.length <= 0"
+                        @click="deleteAccCat" 
+                    >Delete</v-btn>
+                </v-col>
+            </v-row>
+            <br>
         </v-card>
         <br><br>
         <v-card>
@@ -74,6 +120,30 @@ onMounted(() => {
                 select-strategy='single'
                 show-select
             ></v-data-table>
+            <br>
+            <v-row justify="center">
+                <v-col cols="1">
+                    <v-btn
+                        color="secondary"
+                        @click="router.push({ name: 'manageAccommodations', params: { id: 'add' } })"
+                    >Add</v-btn>
+                </v-col>
+                <v-col cols="1">
+                    <v-btn
+                        :color="(selAcc.length != 1) ? `` : `secondary`"
+                        :disabled="selAcc.length != 1"
+                        @click="router.push({ name: 'manageAccommodations', params: { id: selAcc[0].id }})"
+                    >Edit</v-btn>
+                </v-col>
+                <v-col cols="1">
+                    <v-btn
+                        color="primary"
+                        :disabled="selAcc.length <= 0"
+                        @click="deleteAcc" 
+                    >Delete</v-btn>
+                </v-col>
+            </v-row>
+            <br>
         </v-card>
     </v-container>
 </template>
