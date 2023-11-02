@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import SemesterServices from "../services/semesterServices.js";
 import { useRouter } from "vue-router";
+import { VDatePicker } from 'vuetify/labs/VDatePicker'
 
 const router = useRouter();
 
@@ -110,6 +111,7 @@ onMounted(() => {
 		deleteDisabled = false;
 	}
 });
+
 </script>
 
 <template>
@@ -127,9 +129,16 @@ onMounted(() => {
 
 					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.startDate" id="startDate" label="Start Date">
 					</v-text-field>
-
 					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.endDate" id="endDate" label="End Date">
 					</v-text-field>
+					
+					<!-- <v-row justify="center">
+						<v-date-picker 
+							:multiple="true" v-model="dates" @update:displayDate="getDate()"
+							id="dates" label="Dates" required>
+						</v-date-picker>
+					</v-row> -->
+					<br />
 					<v-card-actions>
 						<v-btn :disabled=addDisabled color="success" class="mr-4" @click="add">
 						Add

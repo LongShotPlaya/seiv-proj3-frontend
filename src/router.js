@@ -15,6 +15,8 @@ import ManageCourses from "./views/ManageCourses.vue";
 import ManageSemester from "./views/ManageSemester.vue";
 import ManageUsers from "./views/ManageUsers.vue";
 import OCSchedule from "./views/OCSchedule.vue";
+import AccomInfo from "./views/AccomInfo.vue";
+import ManageAccomCat from "./views/ManageAccomCat.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +76,18 @@ const router = createRouter({
       path: "/oc-schedule",
       name: "ocSchedule",
       component: OCSchedule,
+      meta: { requireAuth: true },
+    },
+    {
+      path: "/accommodation-info",
+      name: "accomInfo",
+      component: AccomInfo,
+      meta: { requireAuth: true },
+    }
+      path: "/accommodation-category/:id",
+      name: "accommodationCategory",
+      component: ManageAccomCat,
+      props: true,
       meta: { requireAuth: true },
     },
     //{
