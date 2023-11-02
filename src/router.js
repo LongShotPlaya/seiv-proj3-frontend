@@ -78,7 +78,7 @@ const router = createRouter({
       meta: { requireAuth: true },
     },
     {
-      path: "/accommodation-category",
+      path: "/accommodation-category/:id",
       name: "accommodationCategory",
       component: ManageAccomCat,
       props: true,
