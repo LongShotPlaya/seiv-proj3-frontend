@@ -8,10 +8,9 @@ import SemesterServices from "../services/semesterServices";
 import AccomServices from "../services/accServices";
 import ACatServices from "../services/accCatServices";
 import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";// These seem to require manual importing for some reason
-import {
-  VDataTable
-} from "vuetify/labs/VDataTable";
+import { useRouter } from "vue-router";
+// This seems to require manual importing for some reason
+import { VDataTable } from "vuetify/labs/VDataTable";
 
 const router = useRouter();
 const props = defineProps({
