@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import SemesterServices from "../services/semesterServices.js";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const message = ref("");
 const props = defineProps({
@@ -17,21 +20,27 @@ const semester = ref({
 	endDate: "",
 });
 
-const save = () => {
+const add = () => {
   const data = {
     name: semester.value.name,
     startDate: semester.value.startDate,
 	endDate: semester.value.endDate,
   };
+  if (semester.value.name != "" && semester.value.name != null && semester.value.startDate != null && semester.value.endDate != null)
+  {
   SemesterServices.createSemester(data)
     .then((response) => {
       semester.value.id = response.data.id;
       console.log("add " + response.data);
+	  message.value = "";
       router.push({ name: "home" });
     })
     .catch((e) => {
       message.value = e.response.data.message;
     });
+  }
+  else
+  	message.value = "Please fill out all fields!";
 };
 
 var addMode = false;
@@ -55,13 +64,19 @@ const update = async () => {
     startDate: semester.value.startDate,
 	endDate: semester.value.endDate,
   };
-  try {
-    const response = await SemesterServices.updateSemester(props.id, data);
-    semester.value.id = response.data.id;
-	location.reload();
-  } catch (e) {
-    message.value = e.response.data.message;
+  if (semester.value.name != "" && semester.value.name != null && semester.value.startDate != null && semester.value.endDate != null)
+  {
+	try {
+		const response = await SemesterServices.updateSemester(props.id, data);
+		semester.value.id = response.data.id;
+		message.value = "";
+		location.reload();
+	} catch (e) {
+		message.value = e.response.data.message;
+	}
   }
+  else
+  	message.value = "Please fill out all fields!";
 };
 
 const cancel = () => {
@@ -74,7 +89,7 @@ const deleteThis = () => {
 };
 
 var mode = ref("");
-var saveDisabled = false;
+var addDisabled = false;
 var updateDisabled = false;
 var deleteDisabled = false;
 
@@ -83,14 +98,14 @@ onMounted(() => {
 	if (addMode == true)
 	{
 		mode = "Adding Mode";
-		saveDisabled = false;
+		addDisabled = false;
 		updateDisabled = true;
 		deleteDisabled = true;
 	}
 	else
 	{
 		mode = "Editing Mode";
-		saveDisabled = true;
+		addDisabled = true;
 		updateDisabled = false;
 		deleteDisabled = false;
 	}
@@ -115,10 +130,9 @@ onMounted(() => {
 
 					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.endDate" id="endDate" label="End Date">
 					</v-text-field>
-
 					<v-card-actions>
-						<v-btn :disabled=saveDisabled color="success" class="mr-4" @click="save">
-						Save
+						<v-btn :disabled=addDisabled color="success" class="mr-4" @click="add">
+						Add
 						</v-btn>
 						<v-btn :disabled=updateDisabled color="success" class="mr-4" @click="update">
 						Update
