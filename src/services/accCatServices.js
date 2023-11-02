@@ -1,22 +1,22 @@
 import apiClient from "./services.js";
 
 export default {
-  getAllAccomodationsCat() {
+  getAllAccomodationCats() {
     return apiClient.get(`/accomodationCats`);
   },
   getAccomodationCat(accomodationCatId) {
-    return apiClient.get(`/accomodations/${accomodationCatId}`);
+    return apiClient.get(`/accomodationCats/${accomodationCatId}`);
   },
   createAccomodationCat(data) {
-    return apiClient.post(`/accomodations`, data);
+    return apiClient.post(`/accomodationCats`, data);
   },
   updateAccomodationCat(accomodationCatId, data) {
-    return apiClient.put(`/accomodations/${accomodationCatId}`, data);
+    return apiClient.put(`/accomodationCats/${accomodationCatId}`, data);
   },
   deleteAccomodationCat(AccomodationCatId) {
-    return apiClient.delete(`/accomodations/${AccomodationCatId}`);
+    return apiClient.delete(`/accomodationCats/${AccomodationCatId}`);
   },
   deleteAllAccomodationCat() {
-    return apiClient.delete(`/accomodations`)
+    return apiClient.delete(`/accomodationCats`)
   },
 };
