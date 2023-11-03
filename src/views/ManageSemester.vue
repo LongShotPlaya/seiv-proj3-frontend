@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import SemesterServices from "../services/semesterServices.js";
 import { useRouter } from "vue-router";
-import { VDatePicker } from 'vuetify/labs/VDatePicker'
+import { VDatePicker } from 'vuetify/labs/VDatePicker';
 
 const router = useRouter();
 
@@ -134,7 +134,7 @@ onMounted(() => {
 					
 					<!-- <v-row justify="center">
 						<v-date-picker 
-							:multiple="true" v-model="dates" @update:displayDate="getDate()"
+							:multiple="true" :v-model="[date1, date2]" @update:displayDate="getDate()"
 							id="dates" label="Dates" required>
 						</v-date-picker>
 					</v-row> -->
