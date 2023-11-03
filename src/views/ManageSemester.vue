@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import SemesterServices from "../services/semesterServices.js";
 import { useRouter } from "vue-router";
-import { VDatePicker } from 'vuetify/labs/VDatePicker'
+import { VDatePicker } from 'vuetify/labs/VDatePicker';
 
 const router = useRouter();
 
@@ -34,7 +34,7 @@ const add = () => {
       semester.value.id = response.data.id;
       console.log("add " + response.data);
 	  message.value = "";
-      router.push({ name: "home" });
+      router.go(-1);
     })
     .catch((e) => {
       message.value = e.response.data.message;
@@ -81,12 +81,12 @@ const update = async () => {
 };
 
 const cancel = () => {
-  router.push({ name: "home" });
+	router.go(-1);
 };
 
 const deleteThis = () => {
   SemesterServices.deleteSemester(props.id)
-  router.push({ name: "home" });
+  router.go(-1);
 };
 
 var mode = ref("");
@@ -134,7 +134,7 @@ onMounted(() => {
 					
 					<!-- <v-row justify="center">
 						<v-date-picker 
-							:multiple="true" v-model="dates" @update:displayDate="getDate()"
+							:multiple="true" :v-model="[date1, date2]" @update:displayDate="getDate()"
 							id="dates" label="Dates" required>
 						</v-date-picker>
 					</v-row> -->
