@@ -12,7 +12,6 @@ import RequestDetails from "./views/RequestDetails.vue";
 import StudentList from "./views/StudentList.vue";
 import StudentAcc from "./views/StudentAcc.vue";
 import ManageCourses from "./views/ManageCourses.vue";
-import ManageAccommodations from "./views/ManageAcc.vue";
 import ManageSemester from "./views/ManageSemester.vue";
 import ManageUsers from "./views/ManageUsers.vue";
 import OCSchedule from "./views/OCSchedule.vue";
@@ -61,13 +60,6 @@ const router = createRouter({
       meta: { requireAuth: true },
     },
     {
-      path: "/manage-accommodations/:id",
-      name: "manageAccommodations",
-      component: ManageAccommodations,
-      props: true,
-      meta: { requireAuth: true },
-    },
-    {
       path: "/manage-semester/:id",
       name: "manageSemester",
       component: ManageSemester,
@@ -91,7 +83,8 @@ const router = createRouter({
       name: "accomInfo",
       component: AccomInfo,
       meta: { requireAuth: true },
-    }
+    },
+    {
       path: "/accommodation-category/:id",
       name: "accommodationCategory",
       component: ManageAccomCat,
