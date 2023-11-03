@@ -21,10 +21,7 @@ const allItems =[
     { title: 'Home', routeName: "home", authLevel: "any" },    
     { title: 'OC Schedule', routeName: "ocSchedule", authLevel: "admin" },        
     { title: 'Manage Users', routeName: "manageUsers", authLevel: "admin" },
-<<<<<<< Updated upstream
-=======
     { title: 'Manage Accommodations', routeName: "accomInfo", authLevel: "admin" },
->>>>>>> Stashed changes
     { title: 'Login', routeName: "login", authLevel: "any" }, 
 ];
 
