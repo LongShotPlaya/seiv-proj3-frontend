@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import AccomCatServices from "../services/accCatServices";
-import AccomServices from "../services/accServices";
 import { useRouter } from "vue-router";
 import { VDataTable } from "vuetify/labs/VDataTable"
 
@@ -10,23 +9,11 @@ const message = ref("");
 
 const accCats = ref([]);
 const selAccCat = ref([]);
-const accs = ref([]);
-const selAcc = ref([]);
 
 const refreshAccCats = () => {
     AccomCatServices.getAllAccomodationCats()
         .then((response) => {
             accCats.value = response.data;
-        })
-        .catch((err) => {
-            message.value = err.response.data.message
-        });
-};
-
-const refreshAccs = () => {
-    AccomServices.getAllAccomodations()
-        .then((response) => {
-            accs.value = response.data;
         })
         .catch((err) => {
             message.value = err.response.data.message
@@ -44,20 +31,8 @@ const deleteAccCat = () => {
         });
 };
 
-const deleteAcc = () => {
-    AccomServices.deleteAccomodation(selAcc.value[0].id)
-        .then((response) => {
-            selAcc.value = [];
-            refreshAccs();
-        })
-        .catch((err) => {
-            message.value = err.response.data.message;
-        });
-}
-
 onMounted(() => {
     refreshAccCats();
-    refreshAccs();
 });
 </script>
 
