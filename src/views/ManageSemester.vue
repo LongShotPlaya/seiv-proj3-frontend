@@ -34,7 +34,7 @@ const add = () => {
       semester.value.id = response.data.id;
       console.log("add " + response.data);
 	  message.value = "";
-      router.push({ name: "home" });
+      router.go(-1);
     })
     .catch((e) => {
       message.value = e.response.data.message;
@@ -81,12 +81,12 @@ const update = async () => {
 };
 
 const cancel = () => {
-  router.push({ name: "home" });
+	router.go(-1);
 };
 
 const deleteThis = () => {
   SemesterServices.deleteSemester(props.id)
-  router.push({ name: "home" });
+  router.go(-1);
 };
 
 var mode = ref("");
