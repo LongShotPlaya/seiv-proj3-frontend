@@ -1,6 +1,9 @@
 <script setup>
-import { ref, onMounted } from "vue";
+
+import { ref } from "vue";
 import studentAccomServices from "../services/studentAccomServices.js";
+import requests from "../services/requestServices.js"
+import student from "../services/studentServices.js"
 import { useRouter } from "vue-router";
 
 const router = useRouter ();
@@ -17,6 +20,24 @@ const acc = ref({
 	id: "",
 });
 
+const approve = () => {
+	const data = {
+		metaData: acc.value.metaData,
+		id: acc.value.id
+	};
+	if ( studentHistory = "" ) {
+		studentAccomServices.updateStudentAccomodations(id, data);
+		router.go(-1);
+	}
+	else {
+		studentAccomServices.createStudentAccomodations(data);
+		router.go(-1);
+	}
+}
+
+const deny = () => {
+	requests.updateRequest(rejected);
+}
 
 
 </script>
@@ -24,14 +45,26 @@ const acc = ref({
 <template>
     <v-container>
 		<v-toolbar>
-			<v-toolbar-title>Student {{ firstName }} {{ lastName }}'s accomodations</v-toolbar-title>
+			<v-toolbar-title>{{ firstName }} {{ lastName }}'s accomodations</v-toolbar-title>
 		</v-toolbar>
 			<br>
+
 		<div class="container">
-			<v-form ref="form" v-model="valid" lazy validation>
-				<v-text-field 
-					required v-model="courses.name" id="name" label="Name">
-				</v-text-field>
+			<h4>Current Accommodations</h4>
+				<ul>
+					<li v-for="accommodation in student.currentAccommodations" :key="accommodation.id">{{ accommodation.name }}</li>
+				</ul>
+					<br>
+			<h4>Previous Accommodations</h4>
+				<ul>
+					<li v-for="accommodation in student.previousAccommodations" :key="accommodation.id">{{ accommodation.name }}</li>
+				</ul>
+					<br>
+			<h4>Requested Accommodations</h4>
+				<ul>
+					<li v-for="request in student.currentRequests" :key="request.id">{{ request.name }}</li>
+				</ul>
+					<br>
 
 
 				<v-text-field 
@@ -43,10 +76,10 @@ const acc = ref({
 					<v-btn :disabled=saveDisabled color="success" class="mr-4" @click="approve">Approve</v-btn>
 					<v-btn :disabled=updateDisabled color="success" class="mr-4" @click="deny">Deny</v-btn>
 				</v-card-actions>
-			</v-form>
 		</div>
 	</v-container>
 </template>
+
 
 <style>
 
