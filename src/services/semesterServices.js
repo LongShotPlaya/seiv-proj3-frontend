@@ -21,5 +21,8 @@ export default {
   },
   getRequestsForSemester(semesterId) {
     return apiClient.get(`/semesters/${semesterId}/requests`);
+  },
+  getStudentAccomsForSemester(semesterId) {
+    return apiClient.get(`/semesters/${semesterId}/studentAccoms`)
   }
 };

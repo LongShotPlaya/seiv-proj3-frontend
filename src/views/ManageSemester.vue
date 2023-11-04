@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import SemesterServices from "../services/semesterServices.js";
 import { useRouter } from "vue-router";
+import { VDatePicker } from 'vuetify/labs/VDatePicker';
 
 const router = useRouter();
 
@@ -33,7 +34,7 @@ const add = () => {
       semester.value.id = response.data.id;
       console.log("add " + response.data);
 	  message.value = "";
-      router.push({ name: "home" });
+      router.go(-1);
     })
     .catch((e) => {
       message.value = e.response.data.message;
@@ -80,12 +81,12 @@ const update = async () => {
 };
 
 const cancel = () => {
-  router.push({ name: "home" });
+	router.go(-1);
 };
 
 const deleteThis = () => {
   SemesterServices.deleteSemester(props.id)
-  router.push({ name: "home" });
+  router.go(-1);
 };
 
 var mode = ref("");
@@ -110,6 +111,7 @@ onMounted(() => {
 		deleteDisabled = false;
 	}
 });
+
 </script>
 
 <template>
@@ -127,9 +129,16 @@ onMounted(() => {
 
 					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.startDate" id="startDate" label="Start Date">
 					</v-text-field>
-
 					<v-text-field required placeholder="MM/DD/YYYY" :valid="true" v-model="semester.endDate" id="endDate" label="End Date">
 					</v-text-field>
+					
+					<!-- <v-row justify="center">
+						<v-date-picker 
+							:multiple="true" :v-model="[date1, date2]" @update:displayDate="getDate()"
+							id="dates" label="Dates" required>
+						</v-date-picker>
+					</v-row> -->
+					<br />
 					<v-card-actions>
 						<v-btn :disabled=addDisabled color="success" class="mr-4" @click="add">
 						Add
