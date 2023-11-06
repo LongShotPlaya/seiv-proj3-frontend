@@ -3,9 +3,9 @@ import Utils from "../config/utils.js";
 import RequestServices from "../services/requestServices";
 import StudentServices from "../services/studentServices";
 import StudentAccomServices from "../services/studentAccomServices";
+import AccomServices from "../services/accServices";
 import UserServices from "../services/userServices";
 import SemesterServices from "../services/semesterServices";
-import AccomServices from "../services/accServices";
 import ACatServices from "../services/accCatServices";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -26,16 +26,18 @@ const message = ref("Add, Edit or Delete Lessons");
 const userRole = ref("Student");
 const request = ref({});
 const student = ref({});
-const studentAccoms = ref([]);
+const studentAccom = ref(null);
 const semester = ref({});
 const accoms = ref([]);
-const accomCats = ref([]);
 const selAccoms = ref([]);
+const accomCats = ref([]);
 
 const refreshACats = () => {
     ACatServices.getAllAccomodationCats()
         .then((response) => {
             accomCats.value = response.data;
+            if (userRole.value == "Administrator") 
+                accoms.value = accomCats.value.map(cat => { return { ...cat, pdf: null }; })
         })
         .catch((err) => {
             console.log(err)
@@ -46,10 +48,13 @@ const refreshACats = () => {
 const refreshAccoms = () => {
     AccomServices.getAllAccomodations()
         .then((response) => {
-            let data = response.data.map(item => { return {...item, accomCat: accomCats.value.find(cat => item.accomodationCatId == cat.id)} });
-            if (userRole.value != "Administrator")
-                data = response.data.filter(accom => !!studentAccoms.value.find(sAccom => sAccom.accomodationId == accom.id));
-            accoms.value = data;
+            let data = response.data.filter(accom => accom.studentAccomId == studentAccom.value.id);
+
+            data.forEach(item => {
+                // Search for existing v-datatable row
+                // If does exist, update pdf value
+                // If doesn't exist, make a new one
+            });
         })
         .catch((err) => {
             message.value = err.response.data.message;
@@ -71,7 +76,7 @@ const refreshRole = () => {
 };
 
 const refreshSemester = () => {
-    SemesterServices.getSemester(request.semesterId)
+    SemesterServices.getSemester(request.value.semesterId)
         .then((response) => {
             semester.value = response.data;
         })
@@ -91,14 +96,10 @@ const refreshStudent = () => {
         });    
 };        
 
-const refreshStudentAccoms = () => {
+const refreshStudentAccom = () => {
     SemesterServices.getStudentAccomsForSemester(semester.value.id)
         .then((response) => {
-            studentAccoms.value = response.data.filter(sAccom => {
-                let result = sAccom.studentId == student.value.id;
-                if (result) selAccoms.value.push(accoms.value.find(accom => accom.id == sAccom.accomodationId));
-                return result;
-            });
+            studentAccom.value = response.data.find(sAccom => sAccom.studentId == student.value.id);
         })
         .catch((err) => {
             message.value = err.response.data.message;
@@ -106,8 +107,7 @@ const refreshStudentAccoms = () => {
 };    
 
 const onSaveRequest = () => {
-    if (request.value.status == "Pending")
-        request.value.status = selAccoms.value.length > 0 ? "Accepted" : "Declined";
+    request.value.status = selAccoms.value.length > 0 ? "Accepted" : "Declined";
 
     RequestServices.updateRequest(props.requestId, request.value)
         .then((response) => {
@@ -119,7 +119,7 @@ const onSaveRequest = () => {
 
     // Add new accoms if in selAccoms, but not in studentAccoms
     let newAccoms = selAccoms.value
-        .filter(accom => !studentAccoms.value.find(sAccom => sAccom.accomodationId == accom.id))
+        .filter(accom => !studentAccom.value.find(sAccom => sAccom.accomodationId == accom.id))
         .map(accom => {
             return {
                 accomodationId: accom.id,
@@ -141,7 +141,7 @@ const onSaveRequest = () => {
     }
     
     // Delete accom if not in selAccoms, but in studentAccoms
-    let deletedAccoms = studentAccoms.value
+    let deletedAccoms = studentAccom.value
         .filter(sAccom => !selAccoms.value.find(accom => accom.id == sAccom.accomodationId))
         .map(sAccom => sAccom.id);
     
@@ -167,7 +167,7 @@ onMounted(() => {
     refreshStudent();
     refreshSemester();
     refreshACats();
-    refreshStudentAccoms();
+    refreshStudentAccom();
     refreshAccoms();
 });
 </script>
@@ -186,8 +186,9 @@ onMounted(() => {
                 v-if="userRole == 'Administrator' || request.status == 'Accepted'"
                 v-model="selAccoms"
                 :headers="[
-                    { title: 'Name', align: 'start', key: 'name'},
-                    { title: 'Category', align: 'end', key: 'accomCat' }
+                    { title: 'Name', align: 'start', key: 'accomCat'},
+                    { title: 'Description', align: 'start', key: 'description' },
+                    { title: 'PDF Link', align: 'start', key: 'pdf' }
                 ]"
                 :items="accoms"
                 :sort-by="[{ key: 'name', order: 'asc' }]"
