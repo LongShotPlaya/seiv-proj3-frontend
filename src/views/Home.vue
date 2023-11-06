@@ -3,7 +3,8 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Utils from "../config/utils.js";
 import SemesterServices from "../services/semesterServices.js";
-import UserServices from "../services/userServices";
+import RequestServices from "../services/requestServices.js";
+import UserServices from "../services/userServices.js";
 
 const router = useRouter();
 
@@ -19,6 +20,7 @@ var thirdHead = false;
 var tableEnable = true;
 const user = Utils.getStore("user");
 
+const semesterid = ref(1);
 const semesters = ref([]);
 const test = ref(["A","B","C"]);
 
@@ -66,6 +68,23 @@ const authenTitle = async () => {
   }
 };
 
+const makeRequest = () => {
+	const data = {
+    	studentId: user.id,
+		semesterId: semesterid,
+		status: "Pending",
+		requestDate: Date(),
+  	};
+	RequestServices.createRequest(data)
+    .then((response) => {
+	  request.value.id = response.data.id;
+	  message.value = "Request Created!";
+    })
+    .catch((e) => {
+      message.value = e.response.data.message;
+    });
+};
+
 const retrieveSemesters = () => {
     SemesterServices.getAllSemesters()
         .then((response) => {
@@ -91,8 +110,8 @@ onMounted(() => {
 		<br />
 		<div class="container">
 			<h2> Accommodations For {{ semesterTitle }}</h2>
-			<v-select label="Semester" v-model="semesterTitle" :items="test" @click="titleChange">
-			</v-select>
+			<v-combobox label="Semester" v-model="semesterTitle" :items="test" @click="titleChange">
+			</v-combobox>
 			<v-table v-if=tableEnable>
 				<thead>
 					<tr>
@@ -109,7 +128,7 @@ onMounted(() => {
 				</tr> -->
 				</tbody>
 			</v-table>
-			<v-btn color="success" class="mr-4"> <!-- @click="add"> -->
+			<v-btn color="success" class="mr-4" @click="makeRequest">
 				Make New Request
 			</v-btn>
 		</div>
