@@ -3,6 +3,7 @@
 import requestServices from "../services/requestServices";
 import studentAcc from "../services/studentAccomServices";
 import AccCats from "../services/accCatServices";
+import students from "../services/userServices";
 import Utils from "../config/utils.js";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -12,11 +13,22 @@ const user = Utils.getStore("user");
 const studentAccoms = ref({});
 const request = ref({});
 const cat = ref([]);
+const student = ref("");
 
 const message = ref("Works so far");
 
 //const id = 1;
 const { studentId } = defineProps(['studentId']);
+
+const getStudent = () => {
+	students.getUser(studentId)
+	.then((response) => {
+		student.value = response.data;
+	})
+	.catch ((err) => {
+		message.value = err.response.data.message;
+	})
+}
 
 const getAccCats = () => {
 	AccCats.getAccomodationCat(studentId)
@@ -64,6 +76,7 @@ onMounted(() => {
 	getCurrentAcc();
 	getRequest();
 	getAccCats();
+	getStudent();
 });
 
 </script>
@@ -77,7 +90,7 @@ onMounted(() => {
   
 	  <v-card>
 		<v-card-title>
-		  Accommodations for {{ user.fName }} {{ user.lName }}
+		  Accommodations for {{ student.fName }} {{ student.lName }}
 		</v-card-title>
 		<v-card-text>
 		  <b>{{ message }}</b>
