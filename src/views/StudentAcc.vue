@@ -13,7 +13,7 @@ const user = Utils.getStore("user");
 const studentAccoms = ref({});
 const request = ref({});
 const cat = ref([]);
-const student = ref("");
+const student = ref({});
 
 const message = ref("Works so far");
 
