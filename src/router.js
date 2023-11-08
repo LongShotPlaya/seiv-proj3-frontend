@@ -49,7 +49,8 @@ const router = createRouter({
       path: "/student-list/:studentId/student-accommodations",
       name: "studentAcc",
       component: StudentAcc,
-      props: true,
+      //props: true,
+      props: route => ({ studentId: route.params.studentId }),
       meta: { requireAuth: true },
     },
     {

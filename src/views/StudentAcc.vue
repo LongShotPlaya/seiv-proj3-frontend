@@ -2,6 +2,7 @@
 
 import requestServices from "../services/requestServices";
 import studentAcc from "../services/studentAccomServices";
+import AccCats from "../services/accCatServices";
 import Utils from "../config/utils.js";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -9,13 +10,36 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const user = Utils.getStore("user");
 const studentAccoms = ref({});
+const request = ref({});
+const cat = ref([]);
 
-const message = ref("You dont have access");
+const message = ref("Works so far");
 
-const id = 1;
+//const id = 1;
+const { studentId } = defineProps(['studentId']);
+
+const getAccCats = () => {
+	AccCats.getAccomodationCat(studentId)
+	.then((response) => {
+		cat.value = response.data;
+	})
+	.catch((err) => {
+		message.value = err.response.data.message;
+	})
+}
+
+const getRequest = () => {
+	requestServices.getRequest(studentId)
+	.then((response) => {
+		request.value = response.data;
+	})
+	.catch((err) => {
+		message.value = err.response.data.message;
+	})
+}
 
 const getCurrentAcc = () => {
-	studentAcc.getStudentAccomodations(id)
+	studentAcc.getStudentAccomodations(studentId)
 	.then((response) => {
 		studentAccoms.value = response.data;
 	})
@@ -25,23 +49,24 @@ const getCurrentAcc = () => {
 };
 
 const approveRequests = () => {
-	requestServices.updateRequest(studentAcc.id, { status: "approved" });
+	requestServices.updateRequest(studentId, { status: "approved" });
 		alert(user.fName + " " + user.lName + "'s accommodation status has been changed to accepted. ");
 		//router.go(-1);
 };
 
 const denyRequests = () => {
-	requestServices.updateRequest(request.id, { status: "denied" })
+	requestServices.updateRequest(studentId, { status: "denied" })
 		alert(user.fName + " " + user.lName + "'s accommodation status has been changed to denied. ");
 		//router.go(-1);
 };
 
 onMounted(() => {
 	getCurrentAcc();
+	getRequest();
+	getAccCats();
 });
 
 </script>
-
 
 <template>
 	<v-container>
@@ -62,7 +87,9 @@ onMounted(() => {
 		<div class="form">
 			<h4>Accommodation Requests</h4>
 				<dl>
-					<dt>{{ `${studentAccoms.id}` }}</dt>
+					<dt>{{ `${studentAccoms.studentId}` }}</dt>
+					<dt>{{ `${request.status}` }}</dt>
+					<dt></dt>
 				</dl>
 		</div>
 
