@@ -63,13 +63,13 @@ const getCurrentAcc = () => {
 const approveRequests = () => {
 	requestServices.updateRequest(studentId, { status: "approved" });
 		alert(user.fName + " " + user.lName + "'s accommodation status has been changed to accepted. ");
-		//router.go(-1);
+		router.go(-1);
 };
 
 const denyRequests = () => {
 	requestServices.updateRequest(studentId, { status: "denied" })
 		alert(user.fName + " " + user.lName + "'s accommodation status has been changed to denied. ");
-		//router.go(-1);
+		router.go(-1);
 };
 
 onMounted(() => {
