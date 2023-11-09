@@ -91,6 +91,10 @@ const router = createRouter({
       props: true,
       meta: { requireAuth: true },
     },
+    { 
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
+    },
     //{
     //  path: "/tutorials",
     //  name: "tutorials",
