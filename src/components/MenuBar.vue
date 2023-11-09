@@ -52,7 +52,7 @@ const resetMenu = () => {
 const logout = () => {
   AuthServices.logoutUser(user.value)
     .then((response) => {
-      console.log(response);
+      //console.log(response);
       Utils.removeItem("user");
       router.push({ name: "login" });
     })

@@ -37,7 +37,7 @@ const apiClient = axios.create({
     if (data.message !== undefined && data.message.includes("Unauthorized")) {
       AuthServices.logoutUser(Utils.getStore("user"))
         .then((response) => {
-          console.log(response);
+          //console.log(response);
           Utils.removeItem("user");
           Router.push({ name: "login" });
         })
