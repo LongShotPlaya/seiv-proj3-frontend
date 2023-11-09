@@ -32,8 +32,8 @@ const selAccoms = ref([]);
 const accomCats = ref([]);
 
 // Gets list of all accommodation categories
-const refreshACats = () => {
-    ACatServices.getAllAccomodationCats()
+const refreshACats = async () => {
+    await ACatServices.getAllAccomodationCats()
         .then((response) => {
             accomCats.value = response.data;
         })
@@ -44,11 +44,13 @@ const refreshACats = () => {
 };
 
 // Gets all accommodations for student
-const refreshAccoms = () => {
-    AccomServices.getAllAccomodations()
+const refreshAccoms = async () => {
+    await AccomServices.getAllAccomodations()
         .then((response) => {
-            const data = response.data.filter(accom => accom.studentAccomId == studentAccom.value.id);
-            
+            const data = response.data.filter(accom => accom.studentAccomId == (studentAccom.value?.id ?? -1));
+            accoms.value = [];
+            selAccoms.value = [];
+
             data.forEach(item => {
                 const obj = {
                     id: item.id,
@@ -87,8 +89,8 @@ const refreshAccoms = () => {
 };
 
 // Gets the request which was sent in
-const refreshRequest = () => {
-    RequestServices.getRequest(props.requestId)
+const refreshRequest = async () => {
+    await RequestServices.getRequest(props.requestId)
         .then((response) => {
             request.value = response.data;
         })
@@ -98,8 +100,8 @@ const refreshRequest = () => {
 };
 
 // Gets the semester for this request
-const refreshSemester = () => {
-    SemesterServices.getSemester(request.value.semesterId)
+const refreshSemester = async () => {
+    await SemesterServices.getSemester(request.value.semesterId)
         .then((response) => {
             semester.value = response.data;
         })
@@ -109,8 +111,8 @@ const refreshSemester = () => {
 };
 
 // Gets the student who the request is for
-const refreshStudent = () => {
-    UserServices.getUser(props.studentId)
+const refreshStudent = async () => {
+    await UserServices.getUser(props.studentId)
         .then((response) => {
             student.value = response.data;
         })    
@@ -120,10 +122,10 @@ const refreshStudent = () => {
 };        
 
 // Gets the student accommodation for the student in the specified semester
-const refreshStudentAccom = () => {
-    SemesterServices.getStudentAccomsForSemester(semester.value.id)
+const refreshStudentAccom = async () => {
+    await SemesterServices.getStudentAccomsForSemester(semester.value.id)
         .then((response) => {
-            studentAccom.value = response.data.find(sAccom => sAccom.studentId == student.value.id);
+            studentAccom.value = response.data.find(sAccom => sAccom.userId == student.value.id);
         })
         .catch((err) => {
             message.value = err.response.data.message;
@@ -180,13 +182,13 @@ const onSaveRequest = async () => {
     {
         console.log("Adding:")
         console.log(newAccoms)
-        //AccomServices.createAccomodations(newAccoms)
-        //    .then((response) => {
-        //
-        //    })
-        //    .catch((err) => {
-        //        message.value = err.response.data.message;
-        //    });
+        AccomServices.createAccomodations(newAccoms)
+            .then((response) => {
+        
+            })
+            .catch((err) => {
+                message.value = err.response.data.message;
+            });
     }
     
     // Delete accom if not in selAccoms, but in accoms
@@ -199,13 +201,13 @@ const onSaveRequest = async () => {
     {
         console.log("Deleting:")
         console.log(deletedAccoms)
-        //AccomServices.deleteAccomodations(deletedAccoms)
-        //    .then((response) => {
-        //
-        //    })
-        //    .catch((err) => {
-        //        message.value = err.response.data.message;
-        //    });
+        AccomServices.deleteAccomodations(deletedAccoms)
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((err) => {
+                message.value = err.response.data.message;
+            });
     }
 
     refreshAll();
@@ -217,13 +219,13 @@ const onCancel = () => {
 };
 
 // Refreshes everything that needs to be
-const refreshAll = () => {
-    refreshRequest();
-    refreshStudent();
-    refreshSemester();
-    refreshACats();
-    refreshStudentAccom();
-    refreshAccoms();
+const refreshAll = async () => {
+    await refreshRequest();
+    await refreshStudent();
+    await refreshSemester();
+    await refreshACats();
+    await refreshStudentAccom();
+    await refreshAccoms();
 };
 
 onMounted(() => {

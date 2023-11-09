@@ -20,7 +20,7 @@ export default {
     return apiClient.delete(`/accomodations/${accomodationId}`);
   },
   deleteAccomodations(data) {
-    return apiClient.delete(`/accomodations/mult`, data);
+    return apiClient.delete(`/accomodations/mult`, {data});
   },
   deleteAllAccomodations() {
     return apiClient.delete(`/accomodations`);
