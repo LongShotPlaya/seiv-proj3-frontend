@@ -34,8 +34,6 @@ const currentRequests = () => {
 	requestServices.getAllRequests()
 	.then((response) => {
 		requests.value = response.data;
-		console.log(requests.value);
-
 	})
 	.catch((err) => {
 		message.value = err.response.data.message;
@@ -51,7 +49,6 @@ const currentUser = () => {
 		message.value = err.response.data.message;
 	})
 }
-
 
 onMounted(() => {
 	currentUser();
@@ -74,9 +71,11 @@ onMounted(() => {
 		  <b>{{ message }}</b>
 		</v-card-text>
 
-		<ol>
-			<li v-for="request in requests" {{ request.userId }} :key="request.id"></li>
-		</ol>
+			<tr v-for="request in requests" :key="request.id">
+				<td>{{ request.status }}</td>
+				<td>{{ request.requestDate }}</td>
+				<td></td>
+			</tr>
 
 	  </v-card>
 	</v-container>
