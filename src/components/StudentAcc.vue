@@ -96,9 +96,11 @@ onMounted(() => {
 					<td>{{ request.status }}</td> 
 					<td>{{ formattedDate(request.requestDate) }}</td>
 					<td>{{ semesters.find(semester => semester.id == request.semesterId).name}}</td>
-					<td><v-btn 
-						color="secondary" 
-						@click="router.push({name: 'requestDetails', params: {studentId: user.id, requestId: request.id}})">View Request</v-btn>
+					<td>
+						<v-btn 
+							color="secondary" 
+							@click="router.push({name: 'requestDetails', params: {studentId: user.id, requestId: request.id}})">View Request
+						</v-btn>
 					</td>
 				</tr>
 			</tbody>
