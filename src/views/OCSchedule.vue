@@ -2,31 +2,38 @@
 import SemesterServices from "../services/semesterServices";
 import CourseServices from "../services/courseServices";
 import CSServices from "../services/courseScheduleServices";
-import FacultyServices from "../services/facultyServices";
-//import StudentServices from "../services/studentServices";
+import UserServices from "../services/userServices";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 // These seem to require manual importing for some reason
 import {
   VDataTable
 } from "vuetify/labs/VDataTable";
+import courseScheduleServices from "../services/courseScheduleServices";
 
 const router = useRouter();
-
 const message = ref([]);
-const semesters = ref([]);
-const courses = ref([]);
-const students = ref([]);
-const faculty = ref([]);
-const schedules = ref([]);
 const slide = ref(0);
 
+const semesters = ref([]);
 const selSem = ref([]);
-const selCourses = ref([]);
-const selStudents = ref([]);
-const selFaculty = ref([]);
-const selSchedules = ref([]);
 
+const courses = ref([]);
+const selCourses = ref([]);
+
+const students = ref([]);
+const selStudents = ref([]);
+
+const faculty = ref([]);
+const selFaculty = ref([]);
+
+const schedules = ref([]);
+const selSchedules = ref([]);
+let addingScheds = [];
+let deletingScheds = [];
+
+
+// Refreshes the list of semesters
 const refreshSemesters = () => {
     SemesterServices.getAllSemesters()
         .then((response) => {
@@ -36,12 +43,14 @@ const refreshSemesters = () => {
             message.value = e.response.data.message;
         });
     semesterChanged();
-}
+};
 
+// Forwards the user to the page for editing semesters
 const editSemester = () => {
     router.push({ name: 'manageSemester', params: { id: selSem.value[0].id } });
-}
+};
 
+// Refreshes the list of all courses
 const refreshCourses = () => {
     CourseServices.getAllCourses()
         .then((response) => {
@@ -50,32 +59,44 @@ const refreshCourses = () => {
         .catch((e) => {
             message.value = e.response.data.message;
         });
-}
+};
 
+// Refreshes the list of all students
 const refreshStudents = () => {
+    UserServices.getAllUsers()
+        .then((response) => {
+            students.value = response.data.filter(user => user.role == "Student");
+        })
+        .catch((err) => {
+            message.value = err.response.data.message
+        })
+};
 
-}
-
+// Refreshes the list of all faculty
 const refreshFaculty = () => {
+    UserServices.getAllUsers()
+        .then((response) => {
+            faculty.value = response.data.filter(user => user.role == "Faculty");
+        })
+        .catch((err) => {
+            message.value = err.response.data.message
+        })
+};
 
-}
-
+// Refreshes the list of all courses for the selected semester
 const refreshSchedules = () => {
     if (!selSem.value[0]) return
 
     SemesterServices.getCoursesForSemester(selSem.value[0].id)
         .then((response) => {
-            schedules.value = response.data;
+            schedules.value = response.data.map(schedule => { return {...schedule, exists: true }; });
         })
         .catch((e) => {
             message.value = e.response.data.message;
         });
-}
+};
 
-const semesterChanged = () => {
-    refreshSchedules();
-}
-
+// Deletes the currently selected semester
 const deleteSems = () => {
     SemesterServices.deleteSemester(selSem.value[0].id)
         .then((response) => {
@@ -85,12 +106,9 @@ const deleteSems = () => {
         .catch((err) => {
             message.value = e.response.data.message;
         });
-}
-
-const courseChanged = () => {
-
-}
-
+};
+    
+// Deletes the currently selected course
 const deleteCourses = () => {
     CourseServices.deleteCourse(selCourses.value[0].id)
         .then((response) => {
@@ -100,6 +118,61 @@ const deleteCourses = () => {
         .catch((err) => {
             message.value = e.response.data.message;
         })
+};
+
+// Runs whenever the selected semester is changed
+const semesterChanged = () => {
+    refreshSchedules();
+}
+
+// Updates course schedules list when necessary
+// Note: does not yet account for when a schedule is prompted to be deleted or restored (and its facultyCourses and studentCourses should be along with it)
+const courseChanged = () => {
+    // If course is in selCourses but not already in schedules, prompt the creation of a new course schedule
+    selCourses.value.forEach(sCourse => {
+        if (!schedules.value.find(schedule => sCourse.id == schedule.courseId))
+        {
+            let newSchedule = {};
+
+            // If the schedule already existed, but was prompted for deletion and then restored, restore it
+            const checkDeleting = deletingScheds.find(schedule => schedule.courseId == sCourse.id);
+            if (!!checkDeleting)
+            {
+                newSchedule = deletingScheds.splice(deletingScheds.indexOf(checkDeleting), 1)[0];
+            }
+            else
+            {
+                newSchedule = {
+                    location: null,
+                    section: null,
+                    courseId: sCourse.id,
+                    semesterId: selSem.value[0].id,
+    
+                    name: sCourse.name,
+                    courseNo: sCourse.courseNo,
+                    exists: false,
+                };
+            }
+            
+            schedules.value.push(newSchedule);
+        }
+    });
+
+    // If course is in courses but not in selCourses, prompt the deletion of a course schedule
+    courses.value.forEach(course => {
+        if (!selCourses.value.find(sCourse => course.id == sCourse.id))
+        {
+            const delSched = schedules.value.find(schedule => schedule.courseId == course.id);
+            if (delSched != null)
+            {
+                if (delSched.exists)
+                {
+                    deletingScheds.push(delSched.id);
+                }
+                schedules.value.splice(schedules.value.indexOf(delSched), 1);
+            }
+        }
+    });
 }
 
 const facultyChanged = () => {
@@ -114,8 +187,32 @@ const scheduleChanged = () => {
 
 }
 
+// Runs whenever the carousel's page is changed
 const onChangeCarousel = () => {
     
+};
+
+// Saves changes
+const onSave = async () => {
+    // Create schedules where necessary and grab new course schedule IDs when done creating
+    CSServices.createCourseSchedules()
+        .then((response) => {
+
+        })
+        .catch((err) => {
+            message.value = err.response.data.message;
+        })
+    // Delete schedules where necessary
+
+
+    // Create new facultyCourses
+
+    // Delete facultyCourses
+
+
+    // Create new studentCourses
+
+    // Delete studentCourses
 }
 
 onMounted(() => {
@@ -193,6 +290,7 @@ onMounted(() => {
                     <v-row>
                         <v-col>
                             <v-carousel v-model="slide" @update:modelValue="onChangeCarousel">
+                                <!--This item represents the list of all courses-->
                                 <v-carousel-item>
                                     <v-row justify="center">
                                         <v-card>
@@ -209,7 +307,7 @@ onMounted(() => {
                                                 :items-per-page-options="[{value:10, title:'10'}]"
                                                 return-object
                                                 select-strategy="multiple"
-                                                show-select
+                                                :show-select="new Date(selSem[0].endDate) > new Date()"
                                                 @input="courseChanged"
                                             ></v-data-table>
                                         </v-card>
@@ -238,6 +336,7 @@ onMounted(() => {
                                         </v-col>
                                     </v-row>
                                 </v-carousel-item>
+                                <!--This item represents the list of all faculty-->
                                 <v-carousel-item>
                                     <v-row justify="center">
                                         <v-card>
@@ -255,12 +354,13 @@ onMounted(() => {
                                                 :items-per-page-options="[{value:10, title:'10'}]"
                                                 return-object
                                                 select-strategy="multiple"
-                                                :show-select="selSchedules.length == 1"
+                                                :show-select="selSchedules.length == 1 && new Date(selSem[0].endDate) > new Date()"
                                                 @input="facultyChanged"
                                             ></v-data-table>
                                         </v-card>
                                     </v-row>
                                 </v-carousel-item>
+                                <!--This item represents the list of all students-->
                                 <v-carousel-item>
                                     <v-row justify="center">
                                         <v-card>
@@ -278,7 +378,7 @@ onMounted(() => {
                                                 :items-per-page-options="[{value:10, title:'10'}]"
                                                 return-object
                                                 select-strategy="multiple"
-                                                :show-select="selSchedules.length == 1"
+                                                :show-select="selSchedules.length == 1 && new Date(selSem[0].endDate) > new Date()"
                                                 @input="studentChanged"
                                             ></v-data-table>
                                         </v-card>
@@ -301,10 +401,24 @@ onMounted(() => {
                                     :items-per-page-options="[{value:10, title:'10'}]"
                                     return-object
                                     select-strategy="single"
-                                    :show-select="slide > 0"
+                                    :show-select="slide > 0 && new Date(selSem[0].endDate) > new Date()"
                                     @input="scheduleChanged"
                                 ></v-data-table>
                             </v-card>
+                            <br>
+                            <v-row justify="center">
+                                <v-col cols="2">
+                                    <v-btn
+                                        color="secondary"
+                                        @click="onSave"
+                                    >Save</v-btn>
+                                </v-col>
+                                <v-col cols="2">
+                                    <v-btn
+                                        color="primary"
+                                    >Cancel</v-btn>
+                                </v-col>
+                            </v-row>
                         </v-col>
                     </v-row>
                 </v-card>
