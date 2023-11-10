@@ -7,14 +7,20 @@ export default {
   getStudentAccomodations(studentAccomsId) {
     return apiClient.get(`/studentAccoms/${studentAccomsId}`);
   },
+  createStudentAccomodation(data) {
+    return apiClient.post(`/studentAccoms`, data);
+  },
   createStudentAccomodations(data) {
     return apiClient.post(`/studentAccoms`, data);
   },
-  updateStudentAccomodations(studentAccomsId, data) {
-    return apiClient.put(`/studentAccoms/${studentAccomsId}`, data);
+  updateStudentAccomodations(studentAccomId, data) {
+    return apiClient.put(`/studentAccoms/${studentAccomId}`, data);
   },
-  deleteStudentAccomodations(studentAccomsId) {
-    return apiClient.delete(`/studentAccoms/${studentAccomsId}`);
+  deleteStudentAccomodation(studentAccomId) {
+    return apiClient.delete(`/studentAccoms/${studentAccomId}`);
+  },
+  deleteStudentAccomodations(data) {
+    return apiClient.delete(`/studentAccoms/mult`, data);
   },
   deleteAllStudentAccomodations() {
     return apiClient.delete(`/studentAccoms/${studentAccomsId}`);
