@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { VDataTable } from 'vuetify/labs/VDataTable'
 import Utils from "../config/utils.js";
 import SemesterServices from "../services/semesterServices.js";
 import RequestServices from "../services/requestServices.js";
@@ -9,54 +10,46 @@ import UserServices from "../services/userServices.js";
 const router = useRouter();
 
 const message = ref("");
+const reqmessage = ref("");
 const authTitle = ref("You should not see this")
-const firstHeader = ref("You should not see this");
-const secondHeader = ref("You should not see this");
-const thirdHeader = ref("You should not see this");
 
 var tableEnable = true;
 const user = Utils.getStore("user");
 
 const semester = ref({name: "Please select a semester", id: null});
 const semesters = ref([]);
-
 const student = ref([]);
 const request = ref([]);
 
-//#region Auth Page
-const authenTitle = async () => {
-	try {
-		switch (user.role)
-		{
-			case "Administrator":
-				authTitle.value = "Administrator Home";
-				firstHeader.value = "Students";
-				secondHeader.value = "Semester";
-				thirdHeader.value = "Status";
-				tableEnable = true;
-				break;
-			case "Faculty":
-				authTitle.value = "Faculty Home";
-				firstHeader.value = "Students (NOT COMPLETE)"; // only display students that are in a shared course
-				secondHeader.value = "Semester";
-				tableEnable = true;
-				break;
-			case "Student":
-				authTitle.value = "Student Home";
-				firstHeader.value = "Semester";
-				secondHeader.value = "Status";
-				tableEnable = true;
-				break;
-			default:
-				authTitle.value = "User Authentication Is Invalid";
-				tableEnable = false;
-				break;
-		}	
-  } catch (e) {
-    message.value = e.response.data.message;
-  }
-};
-//#endregion
+const search = ref('');
+const adminItems = ref([]);
+const facultyItems = ref([]);
+const studentItems = ref([]);
+let adminHeaders = [
+	{ key: 'StudentId', title: 'Student Id' },
+	{ key: 'StudentName', title: 'Student Name' },
+	{ key: 'SemesterName', title: 'Semester' },
+	{ key: 'Status', title: 'Status' },
+];
+let facultyHeaders = [
+	{ key: 'StudentId', title: 'Student Id' },
+	{ key: 'StudentName', title: 'Student Name' },
+	{ key: 'SemesterName', title: 'Semester' },
+];
+let studentHeaders = [
+	{ key: 'SemesterName', title: 'Semester' },
+	{ key: 'Status', title: 'Status' },
+];
+
+const retrieveSemesters = async () => {
+	await SemesterServices.getAllSemesters()
+        .then((response) => {
+          semesters.value = response.data;
+        })
+        .catch((e) => {
+          message.value = e.response.data.message;
+        });
+}
 
 const makeRequest = () => {
 	const data = {
@@ -66,12 +59,12 @@ const makeRequest = () => {
 		requestDate: Date(),
   	};
 	if (semester.value == null)
-		message.value = "Please select a semester!";
+		reqmessage.value = "Please select a semester!";
 	else
 	{
 		RequestServices.createRequest(data)
 		.then((response) => {
-		message.value = "Request Created!";
+		reqmessage.value = "Request Created!";
 		})
 		.catch((e) => {
 		message.value = e.response.data.message;
@@ -79,70 +72,113 @@ const makeRequest = () => {
 	}
 };
 
-const setAdminTable = () => {
-	UserServices.getAllUsers()
+const setAdminTable = async () => {
+	await UserServices.getAllUsers()
         .then((response) => {
 		  student.value = response.data.filter(item => item.role == "Student");
         })
         .catch((e) => {
           message.value = e.response.data.message;
         });
-	RequestServices.getAllRequests()
+	await RequestServices.getAllRequests()
         .then((response) => {
           request.value = response.data;
         })
         .catch((e) => {
           message.value = e.response.data.message;
         });
+	for (let i = 0; i < request.value.length; i++)
+	{
+		let requ = {};
+		requ = request.value[i];
+		const data = {
+    	StudentId: student.value.find(stu => stu.id == requ.userId)?.id,
+		StudentName: `${student.value.find(stu => stu.id == requ.userId)?.fName} ${student.value.find(stu => stu.id == requ.userId)?.lName}`,
+		SemesterName: semesters.value.find(sem => sem.id == requ.semesterId)?.name,
+		Status: requ.status,
+  		};
+		console.log("IT WORKS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! YEEEEEEEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAAAAAAAAA");
+		adminItems.value.push(data);
+	}
 };
 
-const setFacultyTable = () => {
-	// UserServices.getAllUsers()
-    //     .then((response) => {
-	// 	  student.value = response.data.filter(item => item.role == "Student");
-    //     })
-    //     .catch((e) => {
-    //       message.value = e.response.data.message;
-    //     });
+const setFacultyTable = async () => {
+	await UserServices.getAllUsers()
+        .then((response) => {
+		  student.value = response.data.filter(item => item.role == "Student"); // still needs to filter students in the teacher's class maybe
+        })
+        .catch((e) => {
+          message.value = e.response.data.message;
+        });
+	await RequestServices.getAllRequests()
+        .then((response) => {
+          request.value = response.data.filter(item => item.status == "Accepted");
+        })
+        .catch((e) => {
+          message.value = e.response.data.message;
+        });
+	for (let i = 0; i < request.value.length; i++)
+	{
+		let requ = {};
+		requ = request.value[i];
+		const data = {
+    	StudentId: student.value.find(stu => stu.id == requ.userId)?.id,
+		StudentName: `${student.value.find(stu => stu.id == requ.userId)?.fName} ${student.value.find(stu => stu.id == requ.userId)?.lName}`,
+		SemesterName: semesters.value.find(sem => sem.id == requ.semesterId)?.name,
+  		};
+		console.log("IT WORKS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! YEEEEEEEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAAAAAAAAA");
+		facultyItems.value.push(data);
+	}
 };
 
-const setStudentTable = () => {
-	RequestServices.getAllRequests()
+const setStudentTable = async () => {
+	await RequestServices.getAllRequests()
         .then((response) => {
           request.value = response.data.filter(item => item.userId == user.userId);
         })
         .catch((e) => {
           message.value = e.response.data.message;
         });
+		for (let i = 0; i < request.value.length; i++)
+	{
+		let requ = {};
+		requ = request.value[i];
+		const data = {
+		SemesterName: semesters.value.find(sem => sem.id == requ.semesterId)?.name,
+		Status: requ.status,
+  		};
+		console.log("IT WORKS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! YEEEEEEEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAAAAAAAAA");
+		studentItems.value.push(data);
+	}
 };
 
-const retrieveSemesters = () => {
-	SemesterServices.getAllSemesters()
-        .then((response) => {
-          semesters.value = response.data;
-        })
-        .catch((e) => {
-          message.value = e.response.data.message;
-        });
-}
-
 onMounted(() => {
-	authenTitle();
 	retrieveSemesters();
-	switch (user.role)
-	{
-		case "Administrator":
-			setAdminTable();
-			break;
-		case "Faculty":
-			setFacultyTable();
-			break;
-		case "Student":
-			setStudentTable();
-			break;
-	}
+	try {
+		switch (user.role)
+		{
+			case "Administrator":
+				authTitle.value = "Administrator Home";
+				setAdminTable();
+				break;
+			case "Faculty":
+				authTitle.value = "Faculty Home";
+				setFacultyTable();
+				break;
+			case "Student":
+				authTitle.value = "Student Home";
+				setStudentTable();
+				break;
+			default:
+				authTitle.value = "User Authentication Is Invalid";
+				console.log("User Authentication Is Invalid");
+				tableEnable = false;
+				break;
+		}
+	} catch (e) {
+    	message.value = e.response.data.message;
+  	}
 });
-
 </script>
 
 <template>
@@ -150,57 +186,41 @@ onMounted(() => {
 		<v-toolbar>
 			<v-toolbar-title>{{ authTitle }}</v-toolbar-title>
 		</v-toolbar>
-		<br />
 		<div v-if=tableEnable class="container">
-			<h2> Accommodations</h2>
-			<v-row v-if="(user.role == 'Student')"><v-col cols="3"><v-combobox label="Semester"
-				v-model="semester" :items="semesters" item-title="name">
-			</v-combobox>
-			<v-btn :disabled="(new Date(semester.endDate) <= new Date()) || (semester.id == null)"
-			color="success" class="mr-4" @click="makeRequest" >
-				Make New Request
-			</v-btn></v-col></v-row>
 			<br />
-			<v-table>
-				<thead>
-					<tr>
-						<th class="text-left"> {{ firstHeader }}</th>
-						<th class="text-left"> {{ secondHeader }}</th>
-						<th v-if="(user.role == 'Administrator')" class="text-left" > {{ thirdHeader }}</th>
-					</tr>
-				</thead>
-				<tbody v-if="(user.role == 'Administrator')">
-					<tr v-for="item in request" :key="item.id">
-						<td>{{ `${student.find(user => user.id == item.userId)?.fName} 
-						${student.find (user => user.id == item.userId)?.lName}` }}</td>
-						<td>{{ semesters.find(sem => sem.id == item.semesterId)?.name }}</td>
-						<td>{{ item.status }}</td>
-						<td><v-btn>view request</v-btn></td>
-					</tr>
-				</tbody>
-				<tbody v-if="(user.role == 'Faculty')">
-					<tr v-for="item in request" :key="item.id">
-						<td>{{ `${student.find(user => user.id == item.userId)?.fName} 
-						${student.find (user => user.id == item.userId)?.lName}` }}</td>
-						<td>{{ semesters.find(sem => sem.id == item.semesterId)?.name }}</td>
-						<td><v-btn>view request</v-btn></td>
-					</tr>
-				</tbody>
-				<tbody v-if="(user.role == 'Student')">
-					<tr v-for="item in request" :key="item.id">
-						<td>{{ semesters.find(sem => sem.id == item.semesterId)?.name }}</td>
-						<td>{{ request.find(request => request.id == item.id)?.status }}</td>
-						<td><v-btn>view request</v-btn></td>
-					</tr>
-				</tbody>
-			</v-table>
-
+			<v-row><v-col cols="3">
+				<v-text-field label="Search" v-model="search" append-icon="mdi-magnify"
+				single-linehide-details>
+			</v-text-field></v-col></v-row>
+			
+			<v-card>
+				<v-data-table v-if="(user.role == 'Administrator')"
+				:headers="adminHeaders"
+				:items="adminItems"
+				:search="search">
+				</v-data-table>
+				<v-data-table v-if="(user.role == 'Faculty')"
+				:headers="facultyHeaders"
+				:items="facultyItems"
+				:search="search">
+				</v-data-table>
+				<v-data-table v-if="(user.role == 'Student')"
+				:headers="studentHeaders"
+				:items="studentItems"
+				:search="search">
+				</v-data-table>
+			</v-card>
 		</div>
 		<br />
-      		<h4>{{ message }}</h4>
-			<h4>testing param 1: {{  }}</h4>
-		<br />
-			<h4>testing param 2: {{  }}</h4>
-      	<br />
+		<v-row v-if="(user.role == 'Student')"><v-col cols="3"><v-combobox label="Semester"
+			v-model="semester" :items="semesters" item-title="name">
+			</v-combobox>
+			<v-btn :disabled="(new Date(semester.endDate) <= new Date()) || (semester.id == null)"
+			color="success" class="mr-4" @click="makeRequest">
+			Make New Request
+		</v-btn></v-col></v-row>
+		<div>
+			<h4>{{ reqmessage }}</h4>
+		</div>
 	</v-container>
 </template>
