@@ -1,28 +1,14 @@
 <script setup>
 
 import requestServices from "../services/requestServices";
-//import studentAcc from "../services/studentAccomServices";
-//import AccCats from "../services/accCatServices";
 import UserServices from "../services/userServices";
 import SemesterServices from "../services/semesterServices";
 import Utils from "../config/utils.js";
 import { ref, onMounted } from "vue";
 
-//const router = useRouter();
 const user = ref({});
-//const studentAccoms = ref({});
 const requests = ref([]);
-//const cat = ref([]);
-//const student = ref({});
 const semester = ref({});
-
-/**
- * Wants to display
- * 		status
- * 		request state
- * 		semester
- * 
- */
 
 const message = ref("");
 
@@ -31,6 +17,13 @@ const props = defineProps({
     required: true,
   },
 });
+
+/**
+ * Wants to display: 
+ * 		status
+ * 		request state
+ * 		semester
+ */
 
 const formattedDate = (dateString) => {
   const dateObject = new Date(dateString);
@@ -60,8 +53,6 @@ const currentRequests = () => {
     });
 };
 
-
-
 const currentUser = () => {
 	UserServices.getUser(props.userId)
 	.then((response) => {
@@ -86,7 +77,6 @@ onMounted(() => {
 	  <v-toolbar>
 		<v-toolbar-title>Student Accommodations</v-toolbar-title>
 	  </v-toolbar>
-	  	
 	  <v-card>
 		<v-card-title>
 			Accomodations for {{ `${user.fName} ${user.lName}`  }}
@@ -94,33 +84,39 @@ onMounted(() => {
 		<v-card-text>
 		  <b>{{ message }}</b>
 		</v-card-text>
-
-
-
-	<table>
-      <thead>
-        <tr>
-          <th>Status</th>
-          <th>Request Date</th>
-          <th>Semester</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="request in requests" :key="request.id">
-          <td>{{ request.status }}</td>
-          <td>{{ formattedDate(request.requestDate) }}</td>
-          <td>{{ semester.name }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-
-
-
+		<table>
+			<thead>
+				<tr>
+					<th>Status</th>
+					<th>Request Date</th>
+					<th>Semester</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="request in requests" :key="request.id">
+					<td>{{ request.status }}</td> 
+					<td>{{ formattedDate(request.requestDate) }}</td>
+					<td>{{ semester.name }}</td>
+				</tr>
+			</tbody>
+		</table>
 	  </v-card>
 	</v-container>
 </template>
 
 <style>
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
 </style>
