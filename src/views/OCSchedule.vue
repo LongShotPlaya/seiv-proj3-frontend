@@ -29,7 +29,6 @@ const selFaculty = ref([]);
 
 const schedules = ref([]);
 const selSchedules = ref([]);
-let addingScheds = [];
 let deletingScheds = [];
 
 
@@ -86,10 +85,23 @@ const refreshFaculty = () => {
 // Refreshes the list of all courses for the selected semester
 const refreshSchedules = () => {
     if (!selSem.value[0]) return
+    selCourses.value = [];
+    deletingScheds = [];
 
     SemesterServices.getCoursesForSemester(selSem.value[0].id)
         .then((response) => {
-            schedules.value = response.data.map(schedule => { return {...schedule, exists: true }; });
+            schedules.value = response.data.map(schedule => {
+                const schedCourse = courses.value.find(course => course.id == schedule.courseId);
+                if (!!schedCourse) selCourses.value.push(schedCourse);
+                return {
+                    ...schedule,
+                    
+                    name: schedCourse?.name,
+                    courseNo: schedCourse?.courseNo,
+                    exists: true
+                };
+            });
+            selSchedules.value = [];
         })
         .catch((e) => {
             message.value = e.response.data.message;
@@ -167,10 +179,11 @@ const courseChanged = () => {
             {
                 if (delSched.exists)
                 {
-                    deletingScheds.push(delSched.id);
+                    deletingScheds.push(delSched);
                 }
                 schedules.value.splice(schedules.value.indexOf(delSched), 1);
             }
+
         }
     });
 }
@@ -195,15 +208,29 @@ const onChangeCarousel = () => {
 // Saves changes
 const onSave = async () => {
     // Create schedules where necessary and grab new course schedule IDs when done creating
-    CSServices.createCourseSchedules()
-        .then((response) => {
-
-        })
-        .catch((err) => {
-            message.value = err.response.data.message;
-        })
+    const addingScheds = schedules.value.filter(schedule => !schedule.exists);
+    let newIds = [];
+    if (addingScheds.length > 0)
+    {
+        await CSServices.createCourseSchedules(addingScheds)
+            .then((response) => {
+                newIds = response.data.map(schedule => schedule.id);
+            })
+            .catch((err) => {
+                message.value = err.response.data.message;
+            })
+    }
     // Delete schedules where necessary
-
+    if (deletingScheds.length > 0)
+    {
+        await CSServices.deleteCourseSchedules(deletingScheds.map(schedule => schedule.id))
+            .then((response) => {
+                
+            })
+            .catch((err) => {
+                message.value = err.response.data.message;
+            })
+    }
 
     // Create new facultyCourses
 
@@ -213,6 +240,10 @@ const onSave = async () => {
     // Create new studentCourses
 
     // Delete studentCourses
+
+
+    // Refresh necessary items
+    refreshSchedules();
 }
 
 onMounted(() => {
