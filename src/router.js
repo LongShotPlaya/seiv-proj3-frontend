@@ -10,7 +10,7 @@ import Login from "./views/Login.vue";
 import Home from "./views/Home.vue";
 import RequestDetails from "./views/RequestDetails.vue";
 import StudentList from "./views/StudentList.vue";
-import StudentAcc from "./views/StudentAcc.vue";
+import StudentAcc from "./components/StudentAcc.vue";
 import ManageCourses from "./views/ManageCourses.vue";
 import ManageSemester from "./views/ManageSemester.vue";
 import ManageUsers from "./views/ManageUsers.vue";
@@ -46,11 +46,10 @@ const router = createRouter({
       meta: { requireAuth: true },
     },
     {
-      path: "/student-list/:studentId/student-accommodations",
+      path: "/student-list/:userId/student-accommodations",
       name: "studentAcc",
       component: StudentAcc,
-      //props: true,
-      props: route => ({ studentId: route.params.studentId }),
+      props: true,
       meta: { requireAuth: true },
     },
     {
