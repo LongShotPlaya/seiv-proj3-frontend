@@ -242,9 +242,14 @@ const onSave = async () => {
     // Delete studentCourses
 
 
-    // Refresh necessary items
+    // Refresh necessary items (which cancel already does)
+    onCancel();
+};
+
+// Refreshes items without keeping changes
+const onCancel = () => {
     refreshSchedules();
-}
+};
 
 onMounted(() => {
     refreshSemesters();
@@ -447,6 +452,7 @@ onMounted(() => {
                                 <v-col cols="2">
                                     <v-btn
                                         color="primary"
+                                        @click="onCancel"
                                     >Cancel</v-btn>
                                 </v-col>
                             </v-row>
