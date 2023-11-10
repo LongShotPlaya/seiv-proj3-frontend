@@ -3,12 +3,14 @@
 import requestServices from "../services/requestServices";
 import UserServices from "../services/userServices";
 import SemesterServices from "../services/semesterServices";
-import Utils from "../config/utils.js";
+//import Utils from "../config/utils.js";
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const user = ref({});
 const requests = ref([]);
-const semester = ref({});
+const semesters = ref([]);
 
 const message = ref("");
 
@@ -18,22 +20,15 @@ const props = defineProps({
   },
 });
 
-/**
- * Wants to display: 
- * 		status
- * 		request state
- * 		semester
- */
-
 const formattedDate = (dateString) => {
   const dateObject = new Date(dateString);
   return dateObject.toLocaleString();
 };
 
 const currentSemester = () => {
-	SemesterServices.getSemester(props.userId) 
+	SemesterServices.getAllSemesters() 
 	.then((response) => {
-		semester.value = response.data;
+		semesters.value = response.data;
 	})
 	.catch((err) => {
 		message.value = err.response.data.message;
@@ -43,11 +38,13 @@ const currentSemester = () => {
 const currentRequests = () => {
   requestServices.getAllRequests()
     .then((response) => {
-      requests.value = response.data.map((request) => ({
-        ...request,
-        formattedRequestDate: formattedDate(request.requestDate),
-      }));
-    })
+      requests.value = response.data
+		.filter(request => request.userId == user.value.id)
+		.map((request) => ({
+			...request,
+			formattedRequestDate: formattedDate(request.requestDate),
+		}));
+		})
     .catch((err) => {
       message.value = err.response.data.message;
     });
@@ -78,6 +75,7 @@ onMounted(() => {
 		<v-toolbar-title>Student Accommodations</v-toolbar-title>
 	  </v-toolbar>
 	  <v-card>
+		<br>
 		<v-card-title>
 			Accomodations for {{ `${user.fName} ${user.lName}`  }}
 		</v-card-title>
@@ -90,13 +88,18 @@ onMounted(() => {
 					<th>Status</th>
 					<th>Request Date</th>
 					<th>Semester</th>
+					<th>Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr v-for="request in requests" :key="request.id">
 					<td>{{ request.status }}</td> 
 					<td>{{ formattedDate(request.requestDate) }}</td>
-					<td>{{ semester.name }}</td>
+					<td>{{ semesters.find(semester => semester.id == request.semesterId).name}}</td>
+					<td><v-btn 
+						color="secondary" 
+						@click="router.push({name: 'requestDetails', params: {studentId: user.id, requestId: request.id}})">View Request</v-btn>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -119,4 +122,5 @@ th, td {
 th {
   background-color: #f2f2f2;
 }
+
 </style>
