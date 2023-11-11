@@ -7,6 +7,12 @@ export default {
   getCourseSchedule(courseScheduleId) {
     return apiClient.get(`/courseSchedules/${courseScheduleId}`);
   },
+  getFacultyCourseForCourseSchedule(courseScheduleId) {
+    return apiClient.get(`/courseSchedules/${courseScheduleId}/faculty`);
+  },
+  getStudentCourseForCourseSchedule(courseScheduleId) {
+    return apiClient.get(`/courseSchedules/${courseScheduleId}/students`);
+  },
   createCourseSchedule(data) {
     return apiClient.post(`/courseSchedules`, data);
   },
