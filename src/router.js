@@ -17,6 +17,7 @@ import ManageUsers from "./views/ManageUsers.vue";
 import OCSchedule from "./views/OCSchedule.vue";
 import AccomInfo from "./views/AccomInfo.vue";
 import ManageAccomCat from "./views/ManageAccomCat.vue";
+import Notifications from "./views/Notifications.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -89,6 +90,12 @@ const router = createRouter({
       name: "accommodationCategory",
       component: ManageAccomCat,
       props: true,
+      meta: { requireAuth: true },
+    },
+    {
+      path: "/notifications",
+      name: "notifications",
+      component: Notifications,
       meta: { requireAuth: true },
     },
     { 
