@@ -10,6 +10,9 @@ export default {
   getProfessors(userId, semesterId) {
     return apiClient.get(`/user/${userId}/semesters/${semesterId}/faculty`)
   },
+  getUserRequests(userId) {
+    return apiClient.get(`/user/${userId}/requests`);
+  },
   createUser(data) {
     return apiClient.post(`/user`, data);
   },
