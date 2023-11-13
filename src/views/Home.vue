@@ -150,7 +150,7 @@ const getMessage = (userEmail) => {
 			You should expect someone from Student Accommodations to reach out to you soon to schedule a
 			meeting to discuss your accommodations with you.<br><br>You can check the status of your request
 			at any time by visiting the student accommodations website <a href="https://project3.eaglesoftwareteam.com/2023/project3/t3/">here</a>${
-				fromAdmin ? ` or you can reach out to me directly at my email, <a href="${user.email}">${user.email}</a>` : ``
+				fromAdmin ? ` or you can reach out to me directly at my email, <a href="mailto:${user.email}">${user.email}</a>` : ``
 			}.
 			<br><br>Thank you for reaching out to us,<br><br>${fromUser}`,
 		}
