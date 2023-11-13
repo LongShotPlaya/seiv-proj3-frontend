@@ -6,6 +6,7 @@ import AccomServices from "../services/accServices";
 import UserServices from "../services/userServices";
 import SemesterServices from "../services/semesterServices";
 import ACatServices from "../services/accCatServices";
+import NotificationServices from "../services/notificationServices";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 // This seems to require manual importing for some reason
@@ -22,7 +23,8 @@ const props = defineProps({
 });
 const message = ref("Add, Edit or Delete Lessons");
 
-const userRole = Utils.getStore("user")?.role ?? "Student";
+const user = Utils.getStore("user");
+const userRole = user?.role ?? "Student";
 const request = ref({});
 const student = ref({});
 const studentAccom = ref({});
@@ -180,8 +182,6 @@ const onSaveRequest = async () => {
     // If there are accommodations to add, add them
     if (newAccoms.length > 0)
     {
-        console.log("Adding:")
-        console.log(newAccoms)
         AccomServices.createAccomodations(newAccoms)
             .then((response) => {
         
@@ -199,8 +199,6 @@ const onSaveRequest = async () => {
     // If there are accommodations to be deleted, delete them
     if (deletedAccoms.length > 0)
     {
-        console.log("Deleting:")
-        console.log(deletedAccoms)
         AccomServices.deleteAccomodations(deletedAccoms)
             .then((response) => {
                 console.log(response)
@@ -216,6 +214,58 @@ const onSaveRequest = async () => {
 // Does nothing except navigate the user back to the home page
 const onCancel = () => {
     router.push({ name: "home" });
+};
+
+// Sends an email to notify faculty of student's accommodations
+const notify = async () => {
+    let faculty = "";
+    let error = false;
+    await UserServices.getProfessors(student.value.id, semester.value.id)
+        .then((response) => {
+            faculty = response.data.map(fac => fac.email).join(",");
+        })
+        .catch((err) => {
+            message.value = err.response.data.message;
+            error = true;
+        });
+    if (error) return;
+
+    const notification = {
+        studentAccomId: studentAccom.value.id,
+        email: `${faculty},${user.email}`,
+        fromUser: `${user.fName} ${user.lName}`,
+        message: {
+            subject: "Notification of Student Accommodations",
+            text: `This email is to let you know that ${student.value.fName} ${student.value.lName},
+            who has one or more of your classes this semester of ${semester.value.name}, qualifies
+            and has been approved for the following accommodation(s):\n${accoms.value.filter(accom => accom.exists).map(accom => ` - ${accom.accomCat}\n`)}
+            We ask that you provide the accommodation(s) above and if you have any questions, please feel
+            free to reach out to me at this email: ${user.email}.\nIf you already have an account in the
+            student accommodations website, you can access it here (https://project3.eaglesoftwareteam.com/2023/project3/t3/)
+            and view your students' accommodations for this semester. If you don't already have an account,
+            you can log into the website and an account will be made for you. If you are faculty, you'll also
+            need to email me so that I can set up your account properly.\n\nThank you,\n\n${user.fName} ${user.lName}`,
+
+            html: `This email is to let you know that <b>${student.value.fName} ${student.value.lName}</b>,
+            who has one or more of your classes this semester of <b>${semester.value.name}</b>, qualifies
+            and has been approved for the following accommodation(s):<br><ul>${accoms.value.filter(accom => accom.exists).map(accom => `<li>${accom.accomCat}</li>`)}
+            </ul><br>We ask that you provide the accommodation(s) above and if you have any questions, please feel
+            free to reach out to me at this email: <a href="mailto:${user.email}">${user.email}</a>.<br>
+            If you already have an account in the student accommodations website, you can access it
+            <a href="https://project3.eaglesoftwareteam.com/2023/project3/t3/">here</a> and view your
+            students' accommodations for this semester. If you don't already have an account,
+            you can log into the website and an account will be made for you. If you are faculty, you'll also
+            need to email me so that I can set up your account properly.<br><br>Thank you,<br>
+            <br>${user.fName} ${user.lName}`
+        }
+    }
+    NotificationServices.createNotification(notification)
+        .then((response) => {
+            // Let the user know that their notification was sent successfully
+        })
+        .catch((err) => {
+            message.value = err.response.data.message;
+        })
 };
 
 // Refreshes everything that needs to be
@@ -239,7 +289,7 @@ onMounted(() => {
             <v-card-title class="text-h4">Request Details</v-card-title>
             <v-card-title>Student: {{ `${student.fName} ${student.lName}` }}</v-card-title>
             <v-card-title>Semester: {{ `${semester.name}` }}</v-card-title>
-            <v-card-title>Requested On: {{ `${request.requestDate}` }}</v-card-title>
+            <v-card-title>Requested On: {{ `${new Date(request.requestDate).toLocaleDateString()}` }}</v-card-title>
             <v-card-title>Request Status: {{ request.status }}</v-card-title>
             <br>
             <v-card-title
@@ -267,7 +317,7 @@ onMounted(() => {
                 <v-btn
                     v-if="userRole == 'Administrator'"
                     color="secondary"
-                    :disabled="new Date(semester.endDate) > new Date()"
+                    :disabled="new Date(semester.endDate) <= new Date()"
                     @click="onSaveRequest"
                 >Save</v-btn>
             </v-col>
@@ -276,6 +326,14 @@ onMounted(() => {
                     color="primary"
                     @click="onCancel"
                 >{{ userRole == 'Administrator' ? "Cancel" : "Back" }}</v-btn>
+            </v-col>
+            <v-spacer v-if="userRole == 'Administrator'" cols="1"></v-spacer>
+            <v-col v-if="userRole == 'Administrator'" cols="2">
+                <v-btn
+                    color="primary"
+                    :disabled="!studentAccom?.id || request?.status != 'Accepted'"
+                    @click="notify"
+                >Notify Faculty</v-btn>
             </v-col>
         </v-row>
     </v-container>
