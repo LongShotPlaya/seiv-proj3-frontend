@@ -20,11 +20,11 @@ const requests = ref([]);
 
 const search = ref("");
 const headers = [
-	{ key: 'fullName', title: 'Student Name', align: "start" },
-	{ key: 'email', title: 'Student Email', align: "start" },
-	{ key: 'semester', title: 'Semester', align: "start" },
-].concat(user?.role == "Administrator" ? { key: 'status', title: 'Status', align: "start" } : {},
-	{ key: 'actions', title: 'Actions', align: 'start' }
+	{ key: 'fullName', title: 'Student Name', align: "start", sortable: false },
+	{ key: 'email', title: 'Student Email', align: "start", sortable: false },
+	{ key: 'semester', title: 'Semester', align: "start", sortable: false },
+].concat(user?.role == "Administrator" ? { key: 'status', title: 'Status', align: "start", sortable: false } : {},
+	{ key: 'actions', title: 'Actions', align: 'start', sortable: false }
 );
 
 // Gets the list of all semesters
@@ -43,16 +43,7 @@ const retrieveSemesters = async () => {
 const retrieveRequests = async () => {
 	await RequestServices.getAllRequests()
 		.then((response) => {
-			requests.value = response.data.filter(request => students.value.find(stu => {
-				const result = stu.id == request.userId;
-				if (result)
-				{
-					stu.semester = semesters.value.find(sem => request.semesterId == sem.id).name;
-					stu.status = request.status;
-					stu.requestId = request.id;
-				}
-				return result;
-			}));
+			requests.value = response.data;
 		})
 		.catch((err) => {
 			message.value = err.response.data.message;
@@ -64,11 +55,12 @@ const retrieveRequests = async () => {
 const retrieveStudents = async () => {
 	if (!user?.role) return;
 
+	let tempStudents = [];
 	if (user.role == "Administrator")
 	{
 		await UserServices.getAllUsers()
 			.then((response) => {
-				students.value = response.data.filter(user => user.role == "Student");
+				tempStudents = response.data.filter(user => user.role == "Student");
 			})
 			.catch((err) => {
 				message.value = err.response.data.message;
@@ -82,7 +74,7 @@ const retrieveStudents = async () => {
 		{
 			await UserServices.getStudents(user.userId, currSemester.id)
 				.then((response) => {
-					students.value = response.data;
+					tempStudents = response.data;
 				})
 				.catch((err) => {
 					message.value = err.response.data.message;
@@ -91,30 +83,36 @@ const retrieveStudents = async () => {
 	}
 	else
 	{
-		students.value = [{...user, id: user.userId}];
-		student.value = sutdents.value[0];
+		tempStudents = [{...user, id: user.userId}];
 	}
 
-	students.value = students.value.map(stu => {
-		return {
+	students.value = [];
+	requests.value.forEach(request => {
+		const stu = tempStudents.find(stu => stu.id == request.userId);
+		if (!!stu) students.value.push({
 			...stu,
-
+		
 			fullName: `${stu.fName} ${stu.lName}`,
-			semester: ``,
-			status: ``,
-			requestId: null,
-		};
+			semester: semesters.value.find(sem => request.semesterId == sem.id).name,
+			status: request.status,
+			requestId: request.id,
+			requestDate: request.requestDate,
+		});
 	});
+	if (user.role != 'Administrator' && user.role != 'Faculty') student.value = students.value[0];
+	requests.value = requests.value.filter(request => !!students.value.find(stu => stu.id == request.userId));
 };
 
 // Makes a new request for a user
 const makeRequest = async () => {
 	if (!semester.value?.id || (!user.userId && !student.value?.id)) return
 	const data = {
-    	userId: user.role == 'Administrator' ? student.value.id : user.userId,
+    	userId: student.value.id,
 		semesterId: semester.value.id,
 		status: "Pending",
 		requestDate: Date(),
+
+		...getMessage(student.value.email)
   	};
 	
 	// If the request already exists, direct the user to it instead of making a new one
@@ -126,17 +124,60 @@ const makeRequest = async () => {
 	RequestServices.createRequest(data)
 		.then((response) => {
 			// Let the user know that the request was created
+			refreshAll();
 		})
 		.catch((e) => {
 			message.value = e.response.data.message;
 		});
 };
 
+// Determines what the message to the user should say
+const getMessage = (userEmail) => {
+	const fromAdmin = user.role == 'Administrator';
+	const fromUser = fromAdmin ? `${user.fName} ${user.lName}` : `Student Accommodations`;
+	return {
+		fromUser,
+		toUsers: userEmail,
+		message: {
+			subject: `Student Accommodations Request Confirmation`,
+			text: `This is a confirmation that your request for student accommodations has been received.
+			You should expect someone from Student Accommodations to reach out to you soon to schedule a
+			meeting to discuss your accommodations with you.\n\nYou can check the status of your request
+			at any time by visiting the student accommodations website here(https://project3.eaglesoftwareteam.com/2023/project3/t3/)${
+				fromAdmin ? ` or you can reach out to me directly at my email, ${user.email}` : ``
+			}.\n\nThank you for reaching out to us,\n\n${fromUser}`,
+			html: `This is a confirmation that your request for student accommodations has been received.
+			You should expect someone from Student Accommodations to reach out to you soon to schedule a
+			meeting to discuss your accommodations with you.<br><br>You can check the status of your request
+			at any time by visiting the student accommodations website <a href="https://project3.eaglesoftwareteam.com/2023/project3/t3/">here</a>${
+				fromAdmin ? ` or you can reach out to me directly at my email, <a href="${user.email}">${user.email}</a>` : ``
+			}.
+			<br><br>Thank you for reaching out to us,<br><br>${fromUser}`,
+		}
+	};
+};
+
+// Sends a message to the student without making a new request
+const notify = (userEmail) => {
+	UserServices.sendMail(getMessage(userEmail))
+		.then((response) => {
+			
+		})
+		.catch((err) => {
+			message.value = err.response.data.message;
+		});
+};
+
+// Refreshes necessities
+const refreshAll = async () => {
+	await retrieveRequests();
+	await retrieveStudents();
+}
+
 onMounted(async () => {
 	if (!user?.role) router.push({ name: "login" });
 	await retrieveSemesters();
-	await retrieveStudents();
-	retrieveRequests();
+	refreshAll();
 });
 </script>
 
@@ -169,14 +210,22 @@ onMounted(async () => {
 				<v-data-table v-if="user.role == 'Administrator' || user.role == 'Faculty'"
 					:headers="headers"
 					:items="students"
-					:sort-by="[{ key: 'semester', order: 'desc' }]"
+					:sort-by="[{ key: 'requestDate', order: 'desc' }]"
 					:search="search"
 				>
 					<template v-slot:item.actions="{ item }">
-						<v-btn
-							color="secondary"
-							@click="router.push({ name: 'requestDetails', params: {studentId: item.raw.id, requestId: item.raw.requestId}})"
-						>View</v-btn>
+						<v-row justify="center">
+							<v-btn
+								color="secondary"
+								@click="router.push({ name: 'requestDetails', params: {studentId: item.raw.id, requestId: item.raw.requestId}})"
+							>View</v-btn>
+							<v-col v-if="user.role == 'Administrator'" cols="1"></v-col>
+							<v-btn
+								v-if="user.role == 'Administrator'"
+								color="primary"
+								@click="notify(item.raw.email)"
+							>Notify</v-btn>
+						</v-row>
 					</template>
 				</v-data-table>
 				<StudentAcc v-else-if="user.role == 'Student'" :user-id="user.userId" />
@@ -202,7 +251,7 @@ onMounted(async () => {
 					<v-combobox
 						label="Student"
 						v-model="student"
-						:items="students"
+						:items="students.reduce((prev, curr) => (!prev.find(stu => stu.id == curr.id)) ? prev.concat(curr) : prev, [])"
 						item-title="fullName"
 					></v-combobox>
 				</v-col>

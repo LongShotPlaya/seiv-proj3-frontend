@@ -30,5 +30,8 @@ export default {
   },
   deleteAllUsers() {
     return apiClient.delete(`/user`);
-  }
+  },
+  sendMail(data) {
+    return apiClient.post(`/user/mail`, data);
+  },
 };
