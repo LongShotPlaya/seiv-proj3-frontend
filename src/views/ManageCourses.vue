@@ -130,7 +130,7 @@ onMounted(() => {
 
 				<v-card-actions>
 					<v-btn :disabled=saveDisabled color="success" class="mr-4" @click="save">
-						Save
+						Add
 					</v-btn>
 					<v-btn :disabled=updateDisabled color="success" class="mr-4" @click="update">
 						Update
