@@ -62,7 +62,7 @@ const retrieveStudents = async () => {
 		await UserServices.getAllUsers()
 			.then((response) => {
 				tempStudents = response.data.filter(user => user.role == "Student");
-				studentList.value = tempStudents;
+				studentList.value = tempStudents.map(stu => { return {...stu, fullName:`${stu.fName} ${stu.lName}` }; });
 			})
 			.catch((err) => {
 				message.value = err.response.data.message;
