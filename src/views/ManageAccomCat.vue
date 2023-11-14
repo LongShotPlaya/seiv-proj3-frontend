@@ -31,8 +31,7 @@ const save = () => {
     .then((response) => {
       accommodation.value.id = response.data.id;
       console.log("add " + response.data);
-      //router.push({ name: "ocSchedule" });
-	  router.go(-1);
+	  router.push({name: "accomInfo"});
     })
     .catch((e) => {
       message.value = e.response.data.message;
@@ -70,12 +69,12 @@ const update = async () => {
 };
 
 const cancel = () => {
-  router.go(-1);
+	router.push({name: "accomInfo"});
 };
 
 const deleteThis = () => {
     accCatServices.deleteAccomodationCat (props.id)  
-    router.go(-1);
+    router.push({name: "accomInfo"});
 };
 
 var mode = ref("");

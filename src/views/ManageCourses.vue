@@ -32,8 +32,7 @@ const save = () => {
     .then((response) => {
       courses.value.id = response.data.id;
       console.log("add " + response.data);
-      //router.push({ name: "ocSchedule" });
-	  router.go(-1);
+      router.push({ name: "ocSchedule" });
     })
     .catch((e) => {
       message.value = e.response.data.message;
@@ -72,12 +71,12 @@ const update = async () => {
 };
 
 const cancel = () => {
-  router.go(-1);
+	router.push({name: "ocSchedule"});
 };
 
 const deleteThis = () => {
   CourseServices.deleteCourse(props.id)
-  router.go(-1);
+  router.push({name: "ocSchedule"});
 };
 
 var mode = ref("");

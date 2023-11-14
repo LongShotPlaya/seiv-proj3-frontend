@@ -45,7 +45,7 @@ onMounted(() => {
             ></v-data-table>
             <br>
             <v-row justify="center">
-                <v-btn color="primary" @click="router.go(-1)">Back</v-btn>
+                <v-btn color="primary" @click="router.push({name: 'ocSchedule'})">Back</v-btn>
             </v-row>
             <br>
         </v-card>
