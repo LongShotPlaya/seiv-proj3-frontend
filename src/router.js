@@ -9,7 +9,6 @@ import Login from "./views/Login.vue";
 //import EditLesson from "./views/EditLesson.vue";
 import Home from "./views/Home.vue";
 import RequestDetails from "./views/RequestDetails.vue";
-import StudentList from "./views/StudentList.vue";
 import StudentAcc from "./components/StudentAcc.vue";
 import ManageCourses from "./views/ManageCourses.vue";
 import ManageSemester from "./views/ManageSemester.vue";
@@ -38,12 +37,6 @@ const router = createRouter({
       name: "requestDetails",
       component: RequestDetails,
       props: true,
-      meta: { requireAuth: true },
-    },
-    {
-      path: "/student-list",
-      name: "studentList",
-      component: StudentList,
       meta: { requireAuth: true },
     },
     {
