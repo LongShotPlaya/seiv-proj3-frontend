@@ -137,9 +137,6 @@ const makeRequest = async () => {
 const getMessage = (userEmail) => {
 	const fromAdmin = user.role == 'Administrator';
 	const fromUser = fromAdmin ? `${user.fName} ${user.lName}` : `Student Accommodations`;
-	console.log(user)
-	console.log(fromAdmin)
-	console.log(fromUser)
 	return {
 		fromUser,
 		toUsers: userEmail,
