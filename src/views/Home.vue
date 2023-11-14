@@ -14,7 +14,8 @@ const message = ref("");
 
 const semester = ref({name: "Select a semester", id: null});
 const semesters = ref([]);
-const student = ref({fullName: "Select a student"});
+const studentReqs = ref({fullName: "Select a student"});
+const studentList = ref([]);
 const students = ref([]);
 const requests = ref([]);
 
@@ -61,6 +62,7 @@ const retrieveStudents = async () => {
 		await UserServices.getAllUsers()
 			.then((response) => {
 				tempStudents = response.data.filter(user => user.role == "Student");
+				studentList.value = tempStudents;
 			})
 			.catch((err) => {
 				message.value = err.response.data.message;
@@ -99,20 +101,20 @@ const retrieveStudents = async () => {
 			requestDate: request.requestDate,
 		});
 	});
-	if (user.role != 'Administrator' && user.role != 'Faculty') student.value = students.value[0];
+	if (user.role != 'Administrator' && user.role != 'Faculty') studentReqs.value = students.value[0];
 	requests.value = requests.value.filter(request => !!students.value.find(stu => stu.id == request.userId));
 };
 
 // Makes a new request for a user
 const makeRequest = async () => {
-	if (!semester.value?.id || (!user.userId && !student.value?.id)) return
+	if (!semester.value?.id || (!user.userId && !studentReqs.value?.id)) return
 	const data = {
-    	userId: student.value.id,
+    	userId: studentReqs.value.id,
 		semesterId: semester.value.id,
 		status: "Pending",
 		requestDate: Date(),
 
-		...getMessage(student.value.email)
+		...getMessage(studentReqs.value.email)
   	};
 	
 	// If the request already exists, direct the user to it instead of making a new one
@@ -278,14 +280,14 @@ onMounted(async () => {
 				<v-col v-if="user.role == 'Administrator'" cols="5">
 					<v-combobox
 						label="Student"
-						v-model="student"
-						:items="students.reduce((prev, curr) => (!prev.find(stu => stu.id == curr.id)) ? prev.concat(curr) : prev, [])"
+						v-model="studentReqs"
+						:items="studentList"
 						item-title="fullName"
 					></v-combobox>
 				</v-col>
 				<v-col cols="2">
 					<v-btn
-						:disabled="!semester?.id || !student?.id || (user.role == 'Student' && !requests.find(request => request.userId == user.userId && request.semesterId == semester?.id))"
+						:disabled="!semester?.id || !studentReqs?.id || (user.role == 'Student' && !!requests.find(request => request.userId == user.userId && request.semesterId == semester?.id))"
 						color="success"
 						class="mr-4"
 						@click="makeRequest"
