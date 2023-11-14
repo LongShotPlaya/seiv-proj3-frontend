@@ -13,7 +13,7 @@ const refreshNotifications = () => {
     NotificationServices.getAllNotifications()
         .then((response) => {
             notifications.value = response.data.map(not => {
-                return { id: not.id, createdAt: new Date(not.createdAt).toLocaleString(), email: not.email };
+                return { id: not.id, createdAt: new Date(not.createdAt).toLocaleString('en-US', {timeZone: 'UTC'}), email: not.email };
             });
         })
         .catch((err) => {

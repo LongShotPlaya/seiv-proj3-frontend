@@ -289,7 +289,7 @@ onMounted(() => {
             <v-card-title class="text-h4">Request Details</v-card-title>
             <v-card-title>Student: {{ `${student.fName} ${student.lName}` }}</v-card-title>
             <v-card-title>Semester: {{ `${semester.name}` }}</v-card-title>
-            <v-card-title>Requested On: {{ `${new Date(request.requestDate).toLocaleDateString()}` }}</v-card-title>
+            <v-card-title>Requested On: {{ `${new Date(request.requestDate).toLocaleDateString('en-US', {timeZone: 'UTC'})}` }}</v-card-title>
             <v-card-title>Request Status: {{ request.status }}</v-card-title>
             <br>
             <v-card-title
