@@ -525,7 +525,7 @@ onMounted(() => {
                                                 :items="courses"
                                                 :sort-by="[{ key: 'courseNo', order: 'asc' }]"
                                                 :items-per-page="10"
-                                                :items-per-page-options="[{value:10, title:'10'}]"
+                                                :items-per-page-options="[{value:5, title:'5'}]"
                                                 return-object
                                                 select-strategy="multiple"
                                                 :show-select="new Date(selSem[0].endDate) > new Date()"
@@ -572,7 +572,7 @@ onMounted(() => {
                                                 :items="faculty"
                                                 :sort-by="[{ key: 'lName', order: 'asc' }]"
                                                 :items-per-page="10"
-                                                :items-per-page-options="[{value:10, title:'10'}]"
+                                                :items-per-page-options="[{value:5, title:'5'}]"
                                                 return-object
                                                 select-strategy="multiple"
                                                 :show-select="selSchedules.length == 1 && new Date(selSem[0].endDate) > new Date()"
@@ -596,7 +596,7 @@ onMounted(() => {
                                                 :items="students"
                                                 :sort-by="[{ key: 'lName', order: 'asc' }]"
                                                 :items-per-page="10"
-                                                :items-per-page-options="[{value:10, title:'10'}]"
+                                                :items-per-page-options="[{value:5, title:'5'}]"
                                                 return-object
                                                 select-strategy="multiple"
                                                 :show-select="selSchedules.length == 1 && new Date(selSem[0].endDate) > new Date()"
@@ -619,7 +619,7 @@ onMounted(() => {
                                     :items="schedules"
                                     :sort-by="[{ key: 'courseNo', order: 'asc' }]"
                                     :items-per-page="10"
-                                    :items-per-page-options="[{value:10, title:'10'}]"
+                                    :items-per-page-options="[{value:5, title:'5'}]"
                                     return-object
                                     select-strategy="single"
                                     :show-select="slide > 0 && new Date(selSem[0].endDate) > new Date()"
