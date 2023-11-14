@@ -139,20 +139,48 @@ const getMessage = (userEmail) => {
 		fromUser,
 		toUsers: userEmail,
 		message: {
-			subject: `Student Accommodations Request Confirmation`,
-			text: `This is a confirmation that your request for student accommodations has been received.
-			You should expect someone from Student Accommodations to reach out to you soon to schedule a
-			meeting to discuss your accommodations with you.\n\nYou can check the status of your request
-			at any time by visiting the student accommodations website here(https://project3.eaglesoftwareteam.com/2023/project3/t3/)${
-				fromAdmin ? ` or you can reach out to me directly at my email, ${user.email}` : ``
-			}.\n\nThank you for reaching out to us,\n\n${fromUser}`,
-			html: `This is a confirmation that your request for student accommodations has been received.
-			You should expect someone from Student Accommodations to reach out to you soon to schedule a
-			meeting to discuss your accommodations with you.<br><br>You can check the status of your request
-			at any time by visiting the student accommodations website <a href="https://project3.eaglesoftwareteam.com/2023/project3/t3/">here</a>${
-				fromAdmin ? ` or you can reach out to me directly at my email, <a href="mailto:${user.email}">${user.email}</a>` : ``
-			}.
-			<br><br>Thank you for reaching out to us,<br><br>${fromUser}`,
+			subject: `Initial Accommodations Request Email`,
+			text: `Thank you for submitting your request for accommodations. We require supporting
+			documentation to fulfill your request.\n\nDocumentation must be from an appropriate,
+			qualified professional who has seen you within the past 18 months and must contain
+			the following information:\n\n1. You are a person with a disability.\n2. The diagnosis
+			(what is the disability?)\n3. Information about the necessary classroom accommodations
+			you will need to successfully complete the semester. There must be a nexus between the
+			disability and the accommodations requested.\n4. Name and credentials (license #, etc.)
+			of the diagnostic clinician.\n\nDocumentation may be emailed to ${fromAdmin ? `me` : `us`},
+			but it must be on official letterhead. If your doctor's office is unwilling to email
+			${fromAdmin ? `me` : `us`} (this is the most likely scenario), they may mail the document
+			to you. Then, scan and email it to ${fromAdmin ? `me` : `us`}.\n\nOnce the information is
+			submitted, we will schedule a time to meet to discuss the details (in person or via video
+			conference). After our meeting, ${fromAdmin ? `I` : `we`} will email your professors your
+			specific ADA academic accommodations letter. Accommodations MUST BE RENEWED EACH SEMESTER.
+			\n\nPlease let ${fromAdmin ? `me` : `us`} know if you have any other questions or concerns.
+			${fromAdmin ? `I` : `We`} look forward to hearing from you.\n\nYou can check the status of
+			your request at any time by visiting the student accommodations website
+			here(https://project3.eaglesoftwareteam.com/2023/project3/t3/) or you can reach out to
+			${fromAdmin ? `me directlly at my email: ${user.email}` : `us at this email`}.\n\nSincerely,
+			\n\n${fromUser}`,
+			html: `Thank you for submitting your request for accommodations. We require supporting
+			documentation to fulfill your request.<br><br>Documentation must be from an appropriate,
+			qualified professional who has seen you within the past 18 months and must contain
+			the following information:<br><br><ol><li>You are a person with a disability.</li>
+			<li>The diagnosis (what is the disability?)</li><li>Information about the necessary classroom
+			accommodations you will need to successfully complete the semester. There must be a nexus
+			between the disability and the accommodations requested.</li><li>Name and credentials
+			(license #, etc.) of the diagnostic clinician.</li></ol><br><br>Documentation may be
+			emailed to ${fromAdmin ? `me` : `us`}, but it must be on official letterhead. If your
+			doctor's office is unwilling to email ${fromAdmin ? `me` : `us`} (this is the most likely
+			scenario), they may mail the document to you. Then, scan and email it to ${fromAdmin ? `me` : `us`}.
+			<br><br>Once the information is submitted, we will schedule a time to meet to discuss the
+			details (in person or via video conference). After our meeting, ${fromAdmin ? `I` : `we`}
+			will email your professors your specific ADA academic accommodations letter. Accommodations
+			<b>MUST BE RENEWED EACH SEMESTER</b>.<br><br>Please let ${fromAdmin ? `me` : `us`} know
+			if you have any other questions or concerns. ${fromAdmin ? `I` : `We`} look forward to
+			hearing from you.<br><br>You can check the status of your request at any time by visiting
+			the student accommodations website <a href="https://project3.eaglesoftwareteam.com/2023/project3/t3/">here</a>
+			or you can reach out to ${fromAdmin ? `me directlly at my email:
+			<a href="mailto:${user.email}">${user.email}</a>` : `us at this email`}.<br><br>Sincerely,
+			<br><br>${fromUser}`,
 		}
 	};
 };
