@@ -524,7 +524,7 @@ onMounted(() => {
                                                 ]"
                                                 :items="courses"
                                                 :sort-by="[{ key: 'courseNo', order: 'asc' }]"
-                                                :items-per-page="10"
+                                                :items-per-page="5"
                                                 :items-per-page-options="[{value:5, title:'5'}]"
                                                 return-object
                                                 select-strategy="multiple"
@@ -571,7 +571,7 @@ onMounted(() => {
                                                 ]"
                                                 :items="faculty"
                                                 :sort-by="[{ key: 'lName', order: 'asc' }]"
-                                                :items-per-page="10"
+                                                :items-per-page="5"
                                                 :items-per-page-options="[{value:5, title:'5'}]"
                                                 return-object
                                                 select-strategy="multiple"
@@ -595,7 +595,7 @@ onMounted(() => {
                                                 ]"
                                                 :items="students"
                                                 :sort-by="[{ key: 'lName', order: 'asc' }]"
-                                                :items-per-page="10"
+                                                :items-per-page="5"
                                                 :items-per-page-options="[{value:5, title:'5'}]"
                                                 return-object
                                                 select-strategy="multiple"
@@ -618,7 +618,7 @@ onMounted(() => {
                                     ]"
                                     :items="schedules"
                                     :sort-by="[{ key: 'courseNo', order: 'asc' }]"
-                                    :items-per-page="10"
+                                    :items-per-page="5"
                                     :items-per-page-options="[{value:5, title:'5'}]"
                                     return-object
                                     select-strategy="single"
