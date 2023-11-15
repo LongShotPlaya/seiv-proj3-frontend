@@ -43,8 +43,8 @@ const refreshSemesters = () => {
         .then((response) => {
             semesters.value = response.data;
             semesters.value.forEach(semester => {
-                semester.startDate = new Date(semester.startDate).toLocaleDateString();
-                semester.endDate = new Date(semester.endDate).toLocaleDateString();
+                semester.startDate = new Date(semester.startDate).toLocaleDateString('en-US', {timeZone: 'UTC'});
+                semester.endDate = new Date(semester.endDate).toLocaleDateString('en-US', {timeZone: 'UTC'});
             })
         })
         .catch((e) => {
