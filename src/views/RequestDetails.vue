@@ -232,7 +232,7 @@ const notify = async () => {
 
     const notification = {
         studentAccomId: studentAccom.value.id,
-        email: `${faculty},${user.email}`,
+        email: `${faculty},${student.value.email},${user.email}`,
         fromUser: `${user.fName} ${user.lName}`,
         message: {
             subject: "Notification of Student Accommodations",
