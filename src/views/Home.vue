@@ -101,7 +101,7 @@ const retrieveStudents = async () => {
 			requestDate: request.requestDate,
 		});
 	});
-	if (user.role != 'Administrator' && user.role != 'Faculty') studentReqs.value = students.value[0];
+	if (user.role != 'Administrator' && user.role != 'Faculty') studentReqs.value = tempStudents[0];
 	requests.value = requests.value.filter(request => !!students.value.find(stu => stu.id == request.userId));
 };
 
