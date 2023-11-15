@@ -160,7 +160,7 @@ const getMessage = (userEmail) => {
 			${fromAdmin ? `I` : `We`} look forward to hearing from you.\n\nYou can check the status of
 			your request at any time by visiting the student accommodations website
 			here(https://project3.eaglesoftwareteam.com/2023/project3/t3/) or you can reach out to
-			${fromAdmin ? `me directlly at my email: ${user.email}` : `us at this email`}.\n\nSincerely,
+			${fromAdmin ? `me directly at my email: ${user.email}` : `us at this email`}.\n\nSincerely,
 			\n\n${fromUser}`,
 			html: `Thank you for submitting your request for accommodations. We require supporting
 			documentation to fulfill your request.<br><br>Documentation must be from an appropriate,
@@ -180,7 +180,7 @@ const getMessage = (userEmail) => {
 			if you have any other questions or concerns. ${fromAdmin ? `I` : `We`} look forward to
 			hearing from you.<br><br>You can check the status of your request at any time by visiting
 			the student accommodations website <a href="https://project3.eaglesoftwareteam.com/2023/project3/t3/">here</a>
-			or you can reach out to ${fromAdmin ? `me directlly at my email:
+			or you can reach out to ${fromAdmin ? `me directly at my email:
 			<a href="mailto:${user.email}">${user.email}</a>` : `us at this email`}.<br><br>Sincerely,
 			<br><br>${fromUser}`,
 		}
