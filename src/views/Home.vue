@@ -72,7 +72,7 @@ const retrieveStudents = async () => {
 	else if (user.role == "Faculty")
 	{
 		const currDate = new Date();
-		const currSemester = !semesters.value ? semesters.value.find(sem => new Date(sem.startDate) < currDate && new Date(sem.endDate) > currDate) : semesters.value;
+		const currSemester = !semester.value ? semesters.value.find(sem => new Date(sem.startDate) < currDate && new Date(sem.endDate) > currDate) : semester.value;
 		if (!!currSemester)
 		{
 			await UserServices.getStudents(user.userId, currSemester.id)
