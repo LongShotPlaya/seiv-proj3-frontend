@@ -263,7 +263,7 @@ onMounted(async () => {
 			</v-card>
 		</div>
 		<br>
-		<v-card v-if="user.role == 'Student' || user.role == 'Administrator'">
+		<v-card>
 			<br>
 			<v-row justify="center">
 				<v-card-title style="font-size: 16pt;">Make a New Request</v-card-title>
@@ -285,7 +285,7 @@ onMounted(async () => {
 						item-title="fullName"
 					></v-combobox>
 				</v-col>
-				<v-col cols="2">
+				<v-col cols="2" v-if="user.role == 'Student' || user.role == 'Administrator'">
 					<v-btn
 						:disabled="!semester?.id || !studentReqs?.id || (user.role == 'Student' && !!requests.find(request => request.userId == user.userId && request.semesterId == semester?.id))"
 						color="success"
