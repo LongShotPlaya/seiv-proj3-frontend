@@ -210,11 +210,6 @@ const nothing = () => {
 
 };
 
-const test = (item) => {
-	console.log(item.raw)
-	router.push({ name: 'requestDetails', params: {studentId: item.raw.id, requestId: item.raw.requestId}})
-}
-
 onMounted(async () => {
 	if (!user?.role) router.push({ name: "login" });
 	await retrieveSemesters();
@@ -258,7 +253,7 @@ onMounted(async () => {
 						<v-row justify="center">
 							<v-btn
 								color="secondary"
-								@click="test(item)"
+								@click="router.push({ name: 'requestDetails', params: {studentId: item.raw.id, requestId: item.raw.requestId}})"
 							>View</v-btn>
 							<v-col v-if="user.role == 'Administrator'" cols="1"></v-col>
 							<v-btn
