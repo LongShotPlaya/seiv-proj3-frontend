@@ -72,7 +72,9 @@ const retrieveStudents = async () => {
 	else if (user.role == "Faculty")
 	{
 		const currDate = new Date();
-		const currSemester = !semester.value ? semesters.value.find(sem => new Date(sem.startDate) < currDate && new Date(sem.endDate) > currDate) : semester.value;
+		const currSemester = !semesters.value.find(sem => sem == semester.value) ?
+			semesters.value.find(sem => new Date(sem.startDate) < currDate && new Date(sem.endDate) > currDate)
+			: semester.value;
 		if (!!currSemester)
 		{
 			await UserServices.getStudents(user.userId, currSemester.id)
@@ -271,7 +273,7 @@ onMounted(async () => {
 		<v-card>
 			<br>
 			<v-row justify="center">
-				<v-card-title style="font-size: 16pt;">Make a New Request</v-card-title>
+				<v-card-title style="font-size: 16pt;">{{ user.role == 'Faculty' ? `Select Semester to View` : `Make a New Request` }}</v-card-title>
 			</v-row>
 			<v-row justify="center">
 				<v-col cols="3">
