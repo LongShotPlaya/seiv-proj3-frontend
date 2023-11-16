@@ -280,7 +280,7 @@ onMounted(async () => {
 						label="Semester"
 						v-model="semester"
 						:items="semesters.filter(sem => new Date(sem.endDate) > new Date())"
-						@input="user.role == 'Faculty' ? refreshAll() : nothing()"
+						@update:modelValue="user.role == 'Faculty' ? refreshAll() : nothing()"
 						item-title="name"
 					></v-combobox>
 				</v-col>
