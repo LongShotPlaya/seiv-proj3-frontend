@@ -7,6 +7,7 @@ import SemesterServices from "../services/semesterServices.js";
 import RequestServices from "../services/requestServices.js";
 import UserServices from "../services/userServices.js";
 import StudentAcc from "../components/StudentAcc.vue";
+import notificationServices from "../services/notificationServices";
 
 const router = useRouter();
 const user = Utils.getStore("user");
@@ -202,7 +203,11 @@ const notify = (userEmail) => {
 const refreshAll = async () => {
 	await retrieveRequests();
 	await retrieveStudents();
-}
+};
+
+const nothing = () => {
+
+};
 
 onMounted(async () => {
 	if (!user?.role) router.push({ name: "login" });
@@ -274,6 +279,7 @@ onMounted(async () => {
 						label="Semester"
 						v-model="semester"
 						:items="semesters.filter(sem => new Date(sem.endDate) > new Date())"
+						@input="user.role == 'Faculty' ? refreshAll() : nothing()"
 						item-title="name"
 					></v-combobox>
 				</v-col>
