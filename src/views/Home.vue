@@ -201,6 +201,7 @@ const notify = (userEmail) => {
 
 // Refreshes necessities
 const refreshAll = async () => {
+	console.log("Refreshed!")
 	await retrieveRequests();
 	await retrieveStudents();
 };
