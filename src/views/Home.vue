@@ -7,6 +7,7 @@ import SemesterServices from "../services/semesterServices.js";
 import RequestServices from "../services/requestServices.js";
 import UserServices from "../services/userServices.js";
 import StudentAcc from "../components/StudentAcc.vue";
+import notificationServices from "../services/notificationServices";
 
 const router = useRouter();
 const user = Utils.getStore("user");
@@ -202,7 +203,11 @@ const notify = (userEmail) => {
 const refreshAll = async () => {
 	await retrieveRequests();
 	await retrieveStudents();
-}
+};
+
+const nothing = () => {
+
+};
 
 onMounted(async () => {
 	if (!user?.role) router.push({ name: "login" });
@@ -263,7 +268,7 @@ onMounted(async () => {
 			</v-card>
 		</div>
 		<br>
-		<v-card v-if="user.role == 'Student' || user.role == 'Administrator'">
+		<v-card>
 			<br>
 			<v-row justify="center">
 				<v-card-title style="font-size: 16pt;">Make a New Request</v-card-title>
@@ -274,6 +279,7 @@ onMounted(async () => {
 						label="Semester"
 						v-model="semester"
 						:items="semesters.filter(sem => new Date(sem.endDate) > new Date())"
+						@input="user.role == 'Faculty' ? refreshAll() : nothing()"
 						item-title="name"
 					></v-combobox>
 				</v-col>
@@ -285,7 +291,7 @@ onMounted(async () => {
 						item-title="fullName"
 					></v-combobox>
 				</v-col>
-				<v-col cols="2">
+				<v-col cols="2" v-if="user.role == 'Student' || user.role == 'Administrator'">
 					<v-btn
 						:disabled="!semester?.id || !studentReqs?.id || (user.role == 'Student' && !!requests.find(request => request.userId == user.userId && request.semesterId == semester?.id))"
 						color="success"
