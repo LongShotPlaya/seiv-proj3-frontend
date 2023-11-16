@@ -72,7 +72,7 @@ const retrieveStudents = async () => {
 	else if (user.role == "Faculty")
 	{
 		const currDate = new Date();
-		const currSemester = semesters.value.find(sem => new Date(sem.startDate) < currDate && new Date(sem.endDate) > currDate)
+		const currSemester = !semesters.value ? semesters.value.find(sem => new Date(sem.startDate) < currDate && new Date(sem.endDate) > currDate) : semesters.value;
 		if (!!currSemester)
 		{
 			await UserServices.getStudents(user.userId, currSemester.id)
@@ -201,7 +201,6 @@ const notify = (userEmail) => {
 
 // Refreshes necessities
 const refreshAll = async () => {
-	console.log("Refreshed!")
 	await retrieveRequests();
 	await retrieveStudents();
 };
